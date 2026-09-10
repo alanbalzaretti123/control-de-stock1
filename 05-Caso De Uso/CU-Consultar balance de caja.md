@@ -1,24 +1,21 @@
-## Caso de uso: Consultar balance de caja
+**Actores:** Empleado o Empleador (primario). <br>
 
-**Actores:** Empleado o Empleador (primario).
+**Precondiciones:** debe existir al menos un turno registrado en el período consultado. <br>
 
-**Precondiciones:** debe existir al menos un turno registrado en el período consultado.
+**Camino básico:** <br>
+1. El usuario indica el turno (mañana o tarde) de una fecha puntual, o un rango de días, que desea consultar. <br>
+2. El sistema muestra el monto inicial de caja, el total de ventas y el detalle de cada operación realizada en el período indicado. <br>
 
-**Postcondiciones:** ninguna (es una consulta), salvo que se solicite impresión.
+**Caminos alternativos:** <br>
+**1.a** No existen operaciones registradas para el período indicado. <br>
+1.a.1 El sistema informa que no hay movimientos registrados en el período seleccionado. <br>
+**2.a** El usuario tiene rol Empleador. <br>
+2.a.1 El sistema muestra además el costo de la mercadería vendida y la ganancia bruta del período. <br>
+**2.b** El usuario, con rol Empleador, indica que desea imprimir el balance. <br>
+2.b.1 El sistema genera el documento imprimible. Fin del caso de uso. <br>
 
-**Camino básico:**
+**Escenario de éxito:** el usuario visualiza el balance con el nivel de detalle habilitado para su rol. <br>
 
-1.El usuario indica el turno, día, mes o lapso de tiempo a consultar.<br>
-2.El sistema muestra el monto inicial de caja, el total de ventas y el detalle de cada operación realizada en el período.<br>
+**Escenario de fracaso:** no hay movimientos registrados para el período consultado. <br>
 
-**Caminos alternativos:**
-
-1.a No existen operaciones registradas para el período indicado.    1.a.1 El sistema muestra el mensaje "no hay movimientos registrados en el período seleccionado".
-
-2.a El usuario tiene rol Empleador.    2.a.1 El sistema muestra además el costo de la mercadería vendida y la ganancia bruta del período.
-
-2.b El usuario, con rol Empleador, solicita imprimir el balance.    2.b.1 El sistema genera el documento imprimible. Fin del caso de uso.
-
-**Escenario de éxito:** el usuario visualiza el balance con el nivel de detalle habilitado para su rol.
-
-**Escenario de fracaso:** no hay movimientos registrados para el período consultado.
+**Postcondiciones:** ninguna (es una consulta), salvo la generación del documento si se solicitó impresión.

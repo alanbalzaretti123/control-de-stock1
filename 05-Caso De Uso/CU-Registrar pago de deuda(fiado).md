@@ -1,27 +1,21 @@
 ## Caso de uso: Registrar pago de deuda (fiado)
 
-**Actores:** Empleado o Empleador (primario).
+**Actores:** Empleado o Empleador (primario). <br>
 
-**Precondiciones:** el cliente debe tener una factura de fiado impaga o pagada parcialmente.
+**Precondiciones:** el cliente debe tener al menos una factura impaga o pagada parcialmente. <br>
 
-**Postcondiciones:** el saldo adeudado por el cliente se reduce según el monto pagado; si el pago cubre el total, la factura pasa a estado "pagada" y el importe se incorpora al balance de caja del turno.
+**Camino básico:** <br>
+1. El usuario busca al cliente e indica que desea registrar un pago sobre su cuenta de fiado. <br>
+2. El sistema muestra las facturas impagas o parcialmente pagadas del cliente, con el saldo pendiente de cada una y el saldo total adeudado. <br>
+3. El usuario indica qué facturas desea saldar y el monto total a abonar. <br>
+4. El sistema valida que el monto no supere la suma de los saldos pendientes seleccionados y, si es válido, distribuye el monto entre esas facturas (comenzando por la más antigua), actualiza el saldo de cada una —marcándolas como pagadas o pagadas parcial según corresponda— e incorpora el importe al balance de caja del turno. <br>
 
-**Camino básico:**
+**Caminos alternativos:** <br>
+**4.a** El monto ingresado supera la suma de los saldos pendientes de las facturas seleccionadas. <br>
+4.a.1 El sistema informa que el monto supera la deuda seleccionada. Vuelve al paso 3. <br>
 
-1.El usuario busca al cliente y selecciona la factura de fiado a saldar.<br>
-2.El sistema muestra el saldo pendiente de la factura.<br>
-3.El usuario ingresa el monto a abonar y el medio de pago (o una combinación de medios).<br>
-4.El sistema valida que el monto no supere el saldo pendiente.<br>
-5.El sistema registra el pago, actualiza el saldo de la factura e incorpora el importe abonado al balance de caja del turno.<br>
+**Escenario de éxito:** el pago queda registrado y distribuido entre las facturas seleccionadas, actualizando el saldo del cliente. <br>
 
-**Caminos alternativos:**
+**Escenario de fracaso:** el pago no se registra porque el monto ingresado supera la deuda seleccionada. <br>
 
-4.a El monto ingresado supera el saldo pendiente.    4.a.1 El sistema muestra el mensaje "el monto supera la deuda pendiente". Vuelve al paso 3.
-
-5.a El monto abonado cubre el total de la deuda de la factura.    5.a.1 El sistema marca la factura como "pagada". Fin del caso de uso.
-
-5.b El monto abonado es menor al total adeudado.    5.b.1 El sistema marca la factura como "pagada parcial" y mantiene el saldo restante. Fin del caso de uso.
-
-**Escenario de éxito:** el pago queda registrado y el saldo del cliente se actualiza correctamente.
-
-**Escenario de fracaso:** el pago no se registra porque el monto ingresado supera la deuda pendiente.
+**Postcondiciones:** el saldo adeudado por el cliente se reduce según el monto pagado; las facturas cuyo saldo llega a cero quedan marcadas como pagadas.
