@@ -5,7 +5,7 @@
 **Precondiciones:** el proveedor debe estar registrado en el sistema. Si el pago se realiza en el momento desde la caja, debe existir un turno de caja abierto. <br>
 
 **Camino básico:** <br>
-1. El usuario indica el proveedor, el número de remito, y carga cada producto recibido con su cantidad y costo unitario. <br>
+1. El usuario indica el proveedor y el número de remito (si lo hay), y carga cada producto recibido con su cantidad y costo unitario. <br>
 2. El sistema actualiza el stock y el precio de costo vigente de cada producto cargado. <br>
 3. El usuario indica si el pago se realiza en el momento (efectivo o transferencia) o si queda pendiente. <br>
 4. Si el pago es en el momento, el sistema registra un movimiento de salida de caja en el turno abierto; si el pago queda pendiente, registra el ingreso sin asociarle un pago inmediato. <br>

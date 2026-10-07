@@ -13,7 +13,7 @@ Listado organizado con las definiciones precisas y rigurosas de los datos del si
 | `[ \| ]` | Selección | Alternativas; solo se elige una. |
 | `vi{ }vf` | Repetición | El componente se itera entre vi y vf veces. |
 | `( )` | Opcional | El componente puede estar o no (repetición 0{ }1). |
-| `@` | Identificador | Campo único que no se repite ni admite nulos (clave primaria). |
+| `@` | Identificador | Campo que no se repite ni admite nulos (clave primaria). Si una estructura tiene más de un campo con `@`, la clave primaria es compuesta: la combinación de esos campos no se repite. |
 
 ---
 
@@ -27,27 +27,27 @@ Proveedor = @cuit + razonSocial + (telefono) + (email) + (direccion) + estadoPro
 
 Producto = @codigoBarras + nombreProducto + (descripcionProducto) + nombreCategoria + cuit + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
 
-Cliente = @nombreCliente + apellidoCliente + (telefono) + limiteCredito + saldoDeuda
+Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + limiteCredito + saldoDeuda
 
 Turno = @fechaTurno + @tipoTurno + nombreUsuario + horaApertura + (horaCierre) + montoInicialCaja + (montoContado) + (diferenciaCaja) + estadoTurno
 
-Venta = @numeroComprobante + fechaVenta + fechaTurno + tipoTurno + nombreUsuario + condicionVenta + (nombreCliente + apellidoCliente) + 1{DetalleVenta}n + 0{DetallePago}n + totalVenta + estadoVenta
+Venta = @numeroComprobante + fechaVenta + fechaTurno + tipoTurno + nombreUsuario + condicionVenta + (idCliente) + 1{DetalleVenta}n + 0{DetallePago}n + totalVenta + estadoVenta
 
-DetalleVenta = @numeroComprobante + codigoBarras + cantidad + precioUnitario + costoUnitario + subtotal
+DetalleVenta = @numeroComprobante + @codigoBarras + cantidad + precioUnitario + costoUnitario + subtotal
 
-DetallePago = @numeroComprobante + medioPago + fechaPago + monto
+DetallePago = @numeroComprobante + @medioPago + monto
 
-MovimientoCaja = @numeroMovimiento + fechaTurno + tipoTurno + nombreUsuario + fechaHoraMovimiento + tipoMovimiento + medioPago + monto + (numeroComprobante) + (numeroRecibo) + (cuit) + (motivo)
+MovimientoCaja = @numeroMovimiento + fechaTurno + tipoTurno + nombreUsuario + fechaHoraMovimiento + tipoMovimiento + medioPago + monto + (numeroComprobante) + (numeroRecibo) + (idPagoProveedor) + (motivo)
 
-PagoFiado = @numeroRecibo + nombreCliente + apellidoCliente + fechaPago + fechaTurno + tipoTurno + nombreUsuario + 1{MedioPagoFiado}n + montoTotal
+PagoFiado = @numeroRecibo + idCliente + fechaPago + fechaTurno + tipoTurno + nombreUsuario + 1{MedioPagoFiado}n + montoTotal
 
 MedioPagoFiado = @numeroRecibo + @medioPago + monto
 
-IngresoMercaderia = @numeroRemito + cuit + fechaIngreso + nombreUsuario + 1{DetalleIngreso}n + medioPago + montoTotal
+IngresoMercaderia = @idIngreso + cuit + (numeroRemito) + fechaIngreso + nombreUsuario + 1{DetalleIngreso}n + medioPago + montoTotal
 
-DetalleIngreso = @numeroRemito + codigoBarras + cantidad + costoUnitario
+DetalleIngreso = @idIngreso + @codigoBarras + cantidad + costoUnitario
 
-PagoProveedor = @cuit + fechaPago + monto + (concepto)
+PagoProveedor = @idPagoProveedor + cuit + fechaPago + monto + (concepto)
 
 ---
 
@@ -78,7 +78,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | rol | Rol del usuario dentro del sistema, determina las funcionalidades habilitadas. | 15 | Alfanumérico | Discreto: {(D, Empleador); (E, Empleado)} |
 | nombreCategoria | Nombre del rubro/categoría del producto (ej.: comestibles, limpieza). | 50 | Alfanumérico | Texto libre |
 | descripcionCategoria | Descripción de la categoría. | 150 | Alfanumérico | Texto libre |
-| cuit | CUIT del proveedor, utilizado como identificador del mismo. | 13 | Numérico | Formato XX-XXXXXXXX-X |
+| cuit | CUIT del proveedor, utilizado como identificador del mismo. | 13 | Alfanumérico | Formato XX-XXXXXXXX-X |
 | razonSocial | Razón social del proveedor. | 100 | Alfanumérico | Texto libre |
 | telefono | Teléfono de contacto (proveedor o cliente). | 30 | Numérico | Texto libre |
 | email | Correo electrónico de contacto del proveedor. | 80 | Alfanumérico | Texto libre |
@@ -86,7 +86,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | numero | Número o altura del domicilio. | 10 | Alfanumérico | Texto libre |
 | codigoPostal | Código postal del domicilio. | 8 | Alfanumérico | Texto libre |
 | localidad | Localidad del domicilio. | 50 | Alfanumérico | Texto libre |
-| codigoBarras | Código de barras del producto, utilizado como identificador del mismo. Identifica una combinación específica de marca y presentación. | 13 | Numérico | Continuo: {vi: 0; vf: n} |
+| codigoBarras | Código de barras del producto, utilizado como identificador del mismo. Identifica una combinación específica de marca y presentación. Se guarda como texto para no perder los ceros a la izquierda y admitir códigos de distinta longitud (EAN-8, UPC-12, EAN-13 o códigos internos). | 20 | Alfanumérico | Solo dígitos |
 | nombreProducto | Nombre del producto. | 100 | Alfanumérico | Texto libre |
 | descripcionProducto | Descripción del producto. | 200 | Alfanumérico | Texto libre |
 | precioCosto | Costo de adquisición vigente del producto. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
@@ -94,6 +94,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | stockActual | Cantidad disponible en inventario. | — | Numérico (entero) | Continuo: {vi: 0; vf: n} |
 | stockMinimo | Umbral mínimo que dispara la alerta de reposición. | — | Numérico (entero) | Continuo: {vi: 0; vf: n} |
 | fechaVencimiento | Fecha de vencimiento del producto, cuando corresponda. | — | Fecha | Fecha válida, posterior a la fecha de ingreso del producto |
+| idCliente | Número que identifica al cliente con cuenta de fiado; lo asigna el sistema al registrarlo. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | nombreCliente | Nombre del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |
 | apellidoCliente | Apellido del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |
 | limiteCredito | Monto máximo que el cliente puede adeudar en su cuenta corriente; lo define el empleador. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
@@ -119,9 +120,11 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | costoUnitario | Costo unitario del producto al momento de la operación (venta o ingreso). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | subtotal | Subtotal de la línea (cantidad x precioUnitario). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | medioPago | Medio de pago utilizado para abonar una venta, un pago de fiado o un ingreso de mercadería. | 15 | Alfanumérico | Discreto: {(E, efectivo); (T, transferencia)} |
-| fechaPago | Fecha en la que se realizó un pago (a un proveedor, de una venta o de un fiado). | — | Fecha | Fecha válida, no posterior a la fecha actual |
+| fechaPago | Fecha en la que se realizó un pago a un proveedor o un pago de fiado. | — | Fecha | Fecha válida, no posterior a la fecha actual |
 | numeroRecibo | Número de recibo entregado al cliente al registrar un pago sobre su cuenta corriente. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
-| numeroRemito | Número de remito entregado por el proveedor junto con la mercadería. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
+| idIngreso | Número que identifica un ingreso de mercadería; lo asigna el sistema. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
+| numeroRemito | Número del remito entregado por el proveedor junto con la mercadería, cuando lo hay (ej.: 0001-00012345). | 20 | Alfanumérico | Texto libre |
+| idPagoProveedor | Número que identifica un pago realizado a un proveedor; lo asigna el sistema. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaIngreso | Fecha en la que se recibió la mercadería. | — | Fecha | Fecha válida, no posterior a la fecha actual |
 | montoTotal | Importe total abonado por un ingreso de mercadería o por un pago de fiado. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | monto | Importe abonado a un proveedor, correspondiente a una línea de pago de una venta o de un fiado, o de un movimiento de caja. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
