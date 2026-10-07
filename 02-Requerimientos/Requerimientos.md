@@ -35,7 +35,7 @@ RF-10 —
 El sistema permitira al empleador registrar y consultar los proveedores del negocio.
 
 RF-11 —
-El sistema registrara los pagos realizados a los proveedores por la mercadería adquirida.
+El sistema permitirá registrar los pagos realizados a los proveedores, en el momento del ingreso de mercadería o posteriormente, indicando medio de pago y monto, y asociándolos al ingreso que cancelan. También permitirá consultar los ingresos con pago pendiente de cada proveedor.
 
 RF-12 —
 El sistema permitira al empleador generar e imprimir reportes de la información registrada.
@@ -72,6 +72,9 @@ El sistema permitirá cerrar el turno abierto registrando el efectivo contado en
 
 RF-23 —
 El sistema permitirá registrar retiros y aportes de dinero en la caja del turno abierto, indicando monto y motivo.
+
+RF-24 —
+El sistema permitirá a empleados y empleador registrar el ingreso de mercadería, indicando proveedor, número de remito (si lo hay), productos recibidos, cantidades y costo unitario, actualizando el stock y el precio de costo vigente de cada producto.
 
 ---
 

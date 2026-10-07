@@ -43,11 +43,11 @@ PagoFiado = @numeroRecibo + idCliente + fechaPago + fechaTurno + tipoTurno + nom
 
 MedioPagoFiado = @numeroRecibo + @medioPago + monto
 
-IngresoMercaderia = @idIngreso + cuit + (numeroRemito) + fechaIngreso + nombreUsuario + 1{DetalleIngreso}n + medioPago + montoTotal
+IngresoMercaderia = @idIngreso + cuit + (numeroRemito) + fechaIngreso + nombreUsuario + 1{DetalleIngreso}n + montoTotal
 
 DetalleIngreso = @idIngreso + @codigoBarras + cantidad + costoUnitario
 
-PagoProveedor = @idPagoProveedor + cuit + fechaPago + monto + (concepto)
+PagoProveedor = @idPagoProveedor + cuit + (idIngreso) + fechaPago + fechaTurno + tipoTurno + nombreUsuario + medioPago + monto + (concepto)
 
 ---
 
@@ -119,16 +119,16 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | precioUnitario | Precio unitario de venta del producto al momento de la operación. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | costoUnitario | Costo unitario del producto al momento de la operación (venta o ingreso). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | subtotal | Subtotal de la línea (cantidad x precioUnitario). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| medioPago | Medio de pago utilizado para abonar una venta, un pago de fiado o un ingreso de mercadería. | 15 | Alfanumérico | Discreto: {(E, efectivo); (T, transferencia)} |
+| medioPago | Medio de pago utilizado en una venta, un pago de fiado, un pago a proveedor o un movimiento de caja. | 15 | Alfanumérico | Discreto: {(E, efectivo); (T, transferencia)} |
 | fechaPago | Fecha en la que se realizó un pago a un proveedor o un pago de fiado. | — | Fecha | Fecha válida, no posterior a la fecha actual |
 | numeroRecibo | Número de recibo entregado al cliente al registrar un pago sobre su cuenta corriente. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | idIngreso | Número que identifica un ingreso de mercadería; lo asigna el sistema. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | numeroRemito | Número del remito entregado por el proveedor junto con la mercadería, cuando lo hay (ej.: 0001-00012345). | 20 | Alfanumérico | Texto libre |
 | idPagoProveedor | Número que identifica un pago realizado a un proveedor; lo asigna el sistema. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaIngreso | Fecha en la que se recibió la mercadería. | — | Fecha | Fecha válida, no posterior a la fecha actual |
-| montoTotal | Importe total abonado por un ingreso de mercadería o por un pago de fiado. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| montoTotal | Importe total de un ingreso de mercadería (sumatoria de cantidad × costo unitario) o de un pago de fiado. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | monto | Importe abonado a un proveedor, correspondiente a una línea de pago de una venta o de un fiado, o de un movimiento de caja. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| concepto | Detalle o motivo del pago realizado al proveedor. | 150 | Alfanumérico | Texto libre |
+| concepto | Detalle o motivo del pago realizado al proveedor, obligatorio cuando el pago no está asociado a un ingreso de mercadería. | 150 | Alfanumérico | Texto libre |
 | estadoUsuario | Indica si el usuario puede acceder al sistema (activo) o fue dado de baja, por ejemplo al dejar de trabajar en el negocio (inactivo). | — | Booleano | Dominio {(1, activo); (0, inactivo)} |
 | estadoProveedor | Indica si al proveedor se le siguen realizando pedidos y pagos (activo) o se dejó de operar con él (inactivo). | — | Booleano | Dominio {(1, activo); (0, inactivo)} |
 | estadoProducto | Indica si el producto se sigue comercializando y puede venderse (activo) o fue discontinuado del catálogo (inactivo), sin borrarse del historial de ventas pasadas. | — | Booleano | Dominio {(1, activo); (0, inactivo)} |

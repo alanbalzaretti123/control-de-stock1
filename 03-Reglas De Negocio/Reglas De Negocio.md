@@ -19,6 +19,9 @@ El cliente puede cancelar su deuda en forma total o parcial. Los pagos se aplica
 ### 06 — Cambio de turno
 Al cerrar un turno se retira todo el efectivo de la caja. El turno siguiente inicia con el monto de efectivo que se decida en ese momento.
 
+### 07 — Pago a proveedores
+La mercadería recibida puede pagarse en el momento o quedar pendiente. El pago en efectivo se realiza con dinero de la caja; si el efectivo no alcanza, se avisa al empleador y se paga por transferencia. Un ingreso puede pagarse en uno o más pagos.
+
 ---
 
 ### 2. Restricciones<br>
@@ -35,13 +38,16 @@ El monto de un pago registrado sobre la cuenta corriente no podrá superar el sa
 Solo puede existir un turno abierto a la vez. No se podrá abrir un turno nuevo sin haber cerrado el anterior.
 
 ### 05 — Operaciones con turno abierto
-No se podrán registrar ventas, pagos de fiado, pagos a proveedores desde la caja, retiros ni aportes si no hay un turno abierto.
+No se podrán registrar ventas, pagos de fiado, pagos a proveedores, retiros ni aportes si no hay un turno abierto.
 
 ### 06 — Turno cerrado
 Una vez cerrado, un turno no puede modificarse ni se le pueden registrar nuevas operaciones.
 
 ### 07 — Arqueo ciego
 Al cerrar el turno, el usuario debe ingresar el efectivo contado antes de que el sistema le muestre el efectivo esperado.
+
+### 08 — Monto máximo de un pago a proveedor
+El monto de un pago asociado a un ingreso de mercadería no podrá superar el saldo pendiente de ese ingreso.
 
 ---
 
@@ -60,6 +66,9 @@ Toda entrada o salida de dinero (venta de contado, pago de fiado, pago a proveed
 
 ### 05 — Cierre de turno
 Al cerrar un turno el sistema calcula el efectivo esperado, lo compara con el efectivo contado, registra la diferencia y marca el turno como cerrado.
+
+### 06 — Pago a proveedor
+Al registrar un pago a un proveedor se reduce el saldo pendiente del ingreso asociado (si lo hay) y se genera un movimiento de salida de caja en el turno abierto con su medio de pago. Solo los pagos en efectivo reducen el efectivo esperado de la caja.
 
 ---
 
@@ -81,3 +90,9 @@ El efectivo esperado al cierre de un turno se calculará como el monto inicial d
 
 ### 06 — Diferencia de caja
 La diferencia de caja de un turno se calculará como el efectivo contado menos el efectivo esperado. Un valor positivo indica un sobrante y un valor negativo, un faltante.
+
+### 07 — Monto total de un ingreso de mercadería
+El monto total de un ingreso de mercadería se calculará como la sumatoria de la cantidad por el costo unitario de cada producto ingresado.
+
+### 08 — Saldo pendiente de un ingreso de mercadería
+El saldo pendiente de un ingreso se calculará como su monto total menos la sumatoria de los pagos al proveedor asociados a ese ingreso.
