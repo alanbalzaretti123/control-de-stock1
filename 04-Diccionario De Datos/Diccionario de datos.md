@@ -29,13 +29,15 @@ Producto = @codigoBarras + nombreProducto + (descripcionProducto) + nombreCatego
 
 Cliente = @nombreCliente + apellidoCliente + (telefono) + limiteCredito + saldoDeuda
 
-Turno = @fechaTurno + tipoTurno + montoInicialCaja + 1{nombreUsuario}n + totalEfectivo + totalTransferencia + totalTurno
+Turno = @fechaTurno + @tipoTurno + nombreUsuario + horaApertura + (horaCierre) + montoInicialCaja + (montoContado) + (diferenciaCaja) + estadoTurno
 
 Venta = @numeroComprobante + fechaVenta + fechaTurno + tipoTurno + nombreUsuario + condicionVenta + (nombreCliente + apellidoCliente) + 1{DetalleVenta}n + 0{DetallePago}n + totalVenta + estadoVenta
 
 DetalleVenta = @numeroComprobante + codigoBarras + cantidad + precioUnitario + costoUnitario + subtotal
 
 DetallePago = @numeroComprobante + medioPago + fechaPago + monto
+
+MovimientoCaja = @numeroMovimiento + fechaTurno + tipoTurno + nombreUsuario + fechaHoraMovimiento + tipoMovimiento + medioPago + monto + (numeroComprobante) + (numeroRecibo) + (cuit) + (motivo)
 
 PagoFiado = @numeroRecibo + nombreCliente + apellidoCliente + fechaPago + fechaTurno + tipoTurno + nombreUsuario + 1{MedioPagoFiado}n + montoTotal
 
@@ -59,6 +61,8 @@ Dato elemental cuyo valor se elige de un conjunto cerrado de alternativas:
     estado = [ activo | inactivo ]
     estadoVenta = [ confirmada | anulada ]
     condicionVenta = [ contado | fiado ]
+    estadoTurno = [ abierto | cerrado ]
+    tipoMovimiento = [ venta | pagoFiado | pagoProveedor | retiro | aporte ]
 
 ---
 
@@ -94,12 +98,18 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | apellidoCliente | Apellido del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |
 | limiteCredito | Monto máximo que el cliente puede adeudar en su cuenta corriente; lo define el empleador. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | saldoDeuda | Saldo actual de la cuenta corriente del cliente (ventas fiadas menos pagos realizados). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| fechaTurno | Fecha en la que se desarrolla el turno. | — | Fecha | Fecha válida, no posterior a la fecha actual |
+| fechaTurno | Fecha en la que se abrió el turno. Si el turno termina después de la medianoche, sus operaciones conservan esta fecha. | — | Fecha | Fecha válida, no posterior a la fecha actual |
 | tipoTurno | Franja horaria del turno. | 10 | Alfanumérico | Discreto: {(M, mañana); (T, tarde)} |
-| montoInicialCaja | Monto de dinero en caja al iniciar el turno. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| totalEfectivo | Total vendido en efectivo durante el turno. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| totalTransferencia | Total vendido por transferencia durante el turno. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| totalTurno | Importe total vendido durante el turno (efectivo + transferencia). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| montoInicialCaja | Monto de efectivo con el que inicia la caja, decidido al abrir el turno. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| horaApertura | Hora en la que se abrió el turno. | — | Hora | Hora válida |
+| horaCierre | Hora en la que se cerró el turno; vacía mientras el turno está abierto. | — | Hora | Hora válida |
+| montoContado | Efectivo contado en la caja al cerrar el turno (arqueo). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| diferenciaCaja | Efectivo contado menos efectivo esperado al cierre: positivo es sobrante, negativo es faltante. | 12,2 | Numérico (decimal) | Continuo: {vi: -n; vf: n} |
+| estadoTurno | Indica si el turno está abierto (admite operaciones) o cerrado. | — | Alfanumérico | Dominio {(A, abierto); (C, cerrado)} |
+| numeroMovimiento | Número que identifica un movimiento de caja. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
+| fechaHoraMovimiento | Fecha y hora en que se registró el movimiento de caja. | — | Fecha/Hora | Fecha y hora válida, no posterior al momento actual |
+| tipoMovimiento | Origen del movimiento de caja. Venta, pago de fiado y aporte son entradas; pago a proveedor y retiro son salidas. | 15 | Alfanumérico | Dominio {(V, venta); (F, pagoFiado); (P, pagoProveedor); (R, retiro); (A, aporte)} |
+| motivo | Motivo de un retiro o aporte de dinero. | 150 | Alfanumérico | Texto libre |
 | numeroComprobante | Número de comprobante/ticket asociado a una venta. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaVenta | Fecha y hora de la venta. | — | Fecha/Hora | Fecha y hora válida, no posterior al momento actual |
 | condicionVenta | Indica si la venta se abonó en el momento (contado) o se cargó a la cuenta corriente del cliente (fiado). | — | Alfanumérico | Dominio {(C, contado); (F, fiado)} |
@@ -114,7 +124,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | numeroRemito | Número de remito entregado por el proveedor junto con la mercadería. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaIngreso | Fecha en la que se recibió la mercadería. | — | Fecha | Fecha válida, no posterior a la fecha actual |
 | montoTotal | Importe total abonado por un ingreso de mercadería o por un pago de fiado. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| monto | Importe abonado a un proveedor o correspondiente a una línea de pago de una venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| monto | Importe abonado a un proveedor, correspondiente a una línea de pago de una venta o de un fiado, o de un movimiento de caja. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | concepto | Detalle o motivo del pago realizado al proveedor. | 150 | Alfanumérico | Texto libre |
 | estadoUsuario | Indica si el usuario puede acceder al sistema (activo) o fue dado de baja, por ejemplo al dejar de trabajar en el negocio (inactivo). | — | Booleano | Dominio {(1, activo); (0, inactivo)} |
 | estadoProveedor | Indica si al proveedor se le siguen realizando pedidos y pagos (activo) o se dejó de operar con él (inactivo). | — | Booleano | Dominio {(1, activo); (0, inactivo)} |

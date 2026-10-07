@@ -2,13 +2,16 @@
 
 **Actores:** Empleado o Empleador (primario).
 
-**Precondiciones:** el cliente debe tener un saldo adeudado mayor a cero.
+**Precondiciones:**<br>
+- El usuario debe estar logueado en el sistema.<br>
+- Debe existir un turno de caja abierto.<br>
+- El cliente debe tener un saldo adeudado mayor a cero.
 
 **Camino básico:**
 1. El usuario busca al cliente por nombre y apellido e indica que desea registrar un pago sobre su cuenta corriente.<br>
 2. El sistema muestra el saldo total adeudado por el cliente.<br>
 3. El usuario ingresa el medio de pago y el monto a abonar.<br>
-4. El sistema valida que el monto no supere el saldo adeudado y, si es válido, registra el pago, reduce el saldo del cliente e incorpora el importe al balance de caja del turno.<br>
+4. El sistema valida que el monto no supere el saldo adeudado y, si es válido, registra el pago, reduce el saldo del cliente y registra un movimiento de caja por cada medio de pago en el turno abierto.<br>
 
 **Caminos alternativos:**<br>
 **3.a** El usuario indica que el pago se realiza combinando más de un medio de pago, ingresando el monto correspondiente a cada uno.<br>

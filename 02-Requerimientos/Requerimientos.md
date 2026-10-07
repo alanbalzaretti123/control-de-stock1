@@ -64,6 +64,15 @@ El importe de una venta fiada no se incorporará al balance de caja; lo que se i
 RF-20 —
 El sistema permitirá registrar un pago combinado (parte en efectivo, parte en transferencia) para una misma venta.
 
+RF-21 —
+El sistema permitirá a empleados y empleador abrir un turno de caja, indicando el tipo de turno (mañana o tarde) y el monto de efectivo con el que inicia la caja.
+
+RF-22 —
+El sistema permitirá cerrar el turno abierto registrando el efectivo contado en la caja, calculando el efectivo esperado y registrando la diferencia (faltante o sobrante) entre ambos.
+
+RF-23 —
+El sistema permitirá registrar retiros y aportes de dinero en la caja del turno abierto, indicando monto y motivo.
+
 ---
 
 ## 2. Requerimientos No Funcionales (RNF)
