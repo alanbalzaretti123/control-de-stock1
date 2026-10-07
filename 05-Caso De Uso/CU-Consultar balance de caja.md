@@ -1,10 +1,12 @@
+## Caso de uso: Consultar balance de caja
+
 **Actores:** Empleado o Empleador (primario). <br>
 
 **Precondiciones:** debe existir al menos un turno registrado en el período consultado. <br>
 
 **Camino básico:** <br>
 1. El usuario indica el turno (mañana o tarde) de una fecha puntual, o un rango de días, que desea consultar. <br>
-2. El sistema muestra el monto inicial de caja, el total de ventas y el detalle de cada operación realizada en el período indicado. <br>
+2. El sistema muestra, por cada turno del período indicado, el monto inicial de caja, el total de ventas, las entradas y salidas de dinero por medio de pago (ventas de contado, pagos de fiado, pagos a proveedores, retiros y aportes), el efectivo esperado, el efectivo contado al cierre, la diferencia de caja y el detalle de cada operación realizada. <br>
 
 **Caminos alternativos:** <br>
 **1.a** No existen operaciones registradas para el período indicado. <br>

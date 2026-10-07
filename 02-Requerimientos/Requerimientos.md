@@ -47,22 +47,31 @@ RF-14 —
 El sistema permitirá aplicar un aumento de precio masivo a todos los productos asociados a un proveedor determinado.
 
 RF-15 —
-El sistema permitirá registrar una venta fiada, indicando nombre, apellido e importe adeudado por el cliente.
+El sistema permitirá registrar una venta fiada a un cliente registrado, cargando el total de la venta en su cuenta corriente.
 
 RF-16 —
-El sistema permitirá registrar pagos parciales sobre una deuda de fiado.
+El sistema permitirá registrar pagos totales o parciales sobre la cuenta corriente de un cliente, reduciendo su saldo adeudado.
 
 RF-17 —
-Las ventas fiadas se generarán como una factura con el detalle de productos, cantidades y precios, quedando marcada como impaga hasta que el cliente abone.
+Las ventas fiadas generarán un comprobante con el detalle de productos, cantidades y precios, igual que una venta de contado.
 
 RF-18 —
 El stock se descontará al momento de la venta fiada, independientemente de si fue abonada o no.
 
 RF-19 —
-El importe de una venta fiada se incorporará al balance de caja recién cuando el cliente la abone.
+El importe de una venta fiada no se incorporará al balance de caja; lo que se incorpora es cada pago que el cliente realice sobre su cuenta corriente, en el turno en que se cobra.
 
 RF-20 —
 El sistema permitirá registrar un pago combinado (parte en efectivo, parte en transferencia) para una misma venta.
+
+RF-21 —
+El sistema permitirá a empleados y empleador abrir un turno de caja, indicando el tipo de turno (mañana o tarde) y el monto de efectivo con el que inicia la caja.
+
+RF-22 —
+El sistema permitirá cerrar el turno abierto registrando el efectivo contado en la caja, calculando el efectivo esperado y registrando la diferencia (faltante o sobrante) entre ambos.
+
+RF-23 —
+El sistema permitirá registrar retiros y aportes de dinero en la caja del turno abierto, indicando monto y motivo.
 
 ---
 
@@ -90,5 +99,5 @@ RD-01 —
 El margen de ganancia utilizado para determinar el precio de venta podrá variar según el producto.
 
 RD-02 —
-Una venta fiada queda registrada como factura impaga hasta que el cliente abona el importe adeudado.
+Cada cliente con fiado posee una cuenta corriente: las ventas fiadas suman a su saldo adeudado y los pagos lo reducen, sin imputarse a una venta en particular.
 

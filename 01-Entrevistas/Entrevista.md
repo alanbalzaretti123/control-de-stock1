@@ -39,7 +39,7 @@
 **11) ¿El cliente puede pagar solo un porcentaje de lo que adeuda?  ejemplo: debe 20000 y solo tiene 15000 para pagar.** <br>
 *   **Rta:**Si, se puede cancelar solo un porcentaje de la deuda.<br>
 
-**12) entendemos, en ese caso Para poder llevar correctamente el control del stock y del balance de caja, proponemos que estas ventas se registren mediante una factura, detallando los productos vendidos, cantidades y precios. La factura quedaría registrada como impaga hasta que el cliente realice el pago. De esta manera, los productos se descuentan del stock al momento de realizar la venta, pero el importe no se incorpora al balance de caja hasta que sea abonado. ¿Está de acuerdo con manejarlo de esta manera?**<br>
+**12) entendemos, en ese caso Para poder llevar correctamente el control del stock y del balance de caja, proponemos registrar a los clientes que compran fiado y llevarles una cuenta corriente. Cada venta fiada se registra con su comprobante, detallando los productos vendidos, cantidades y precios, y su total se suma a la deuda del cliente. Cuando el cliente paga (total o parcialmente), el pago se descuenta de su deuda total, sin importar de qué compra provino. De esta manera, los productos se descuentan del stock al momento de realizar la venta, pero el importe no se incorpora al balance de caja hasta que el cliente paga. ¿Está de acuerdo con manejarlo de esta manera?**<br>
 *   **Rta:** Dale, me parece bien
 
 **13)¿Cuando el cliente compra una cierta cantidad $10000 se le permite hacer un pago combinado? ejemplo: 6000 en efectivo y 4000 en transferencia.** <br>

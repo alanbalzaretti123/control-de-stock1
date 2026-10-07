@@ -13,7 +13,7 @@
 3. El usuario indica que finalizó la carga de productos.<br>
 4. El sistema calcula el total de la venta.<br>
 5. El usuario indica el medio de pago.<br>
-6. El sistema registra el pago, descuenta el stock de cada producto vendido, genera el comprobante y actualiza los totales del turno.
+6. El sistema registra el pago, descuenta el stock de cada producto vendido, genera el comprobante y registra un movimiento de caja por cada medio de pago en el turno abierto.
 
 **Caminos alternativos:**<br>
 **2.a** El código de barras ingresado no corresponde a ningún producto registrado.<br>
