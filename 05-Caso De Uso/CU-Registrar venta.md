@@ -1,4 +1,4 @@
-## Caso de uso: Registrar venta
+## CU-05 — Registrar venta
 
 **Actores:** Empleado o Empleador (primario).
 
@@ -36,9 +36,9 @@
   3.b.1 El sistema descarta la venta sin registrar nada ni modificar el stock. Fin del caso de uso.<br>
 **5.a** El usuario indica que la venta es fiada e indica el cliente correspondiente.<br>
   5.a.1 El sistema muestra el saldo adeudado del cliente y verifica que esté habilitado para fiado; si está inhabilitado, informa que no puede otorgarse el fiado y finaliza sin registrar la venta; caso contrario, descuenta el stock, genera un cargo por el total de la venta en la cuenta corriente del cliente y no incorpora el importe al balance de caja. Fin del caso de uso.<br>
-  5.a.2 Si el cliente entrega dinero a cuenta en ese momento, la venta se registra completa como fiada y lo entregado se registra a continuación mediante el caso de uso Registrar pago de deuda.<br>
+  5.a.2 Si el cliente entrega dinero a cuenta en ese momento, la venta se registra completa como fiada y lo entregado se registra a continuación mediante el caso de uso Registrar pago de deuda (CU-07).<br>
 **5.a.a** El cliente no está registrado en el sistema.<br>
-  5.a.a.1 El usuario da de alta al cliente mediante el caso de uso Gestionar clientes. Continúa en el paso 5.a.1.<br>
+  5.a.a.1 El usuario da de alta al cliente mediante el caso de uso Gestionar clientes (CU-08). Continúa en el paso 5.a.1.<br>
 **5.b** El usuario indica que el pago se realiza combinando más de un medio de pago, ingresando el monto correspondiente a cada uno.<br>
   5.b.1 El sistema valida que la suma de los montos ingresados sea igual al total de la venta. Continúa en el paso 6.<br>
   Nota: los montos registrados corresponden al importe de la venta abonado con cada medio, no al dinero entregado por el cliente. El vuelto lo calcula y entrega el empleado, y no se registra en el sistema.<br>

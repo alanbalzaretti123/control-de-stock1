@@ -1,4 +1,4 @@
-## Caso de uso: Consultar productos a reponer
+## CU-17 — Consultar productos a reponer
 
 **Actores:** Empleado o Empleador (primario). <br>
 

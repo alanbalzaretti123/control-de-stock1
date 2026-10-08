@@ -2,46 +2,44 @@
 
 ## 1. Requerimientos Funcionales (RF)
 
-1. Requerimientos funcionales
-
 RF-01 —
-El sistema permitira al empleador dar de alta, modificar y dar de baja productos, incluyendo la corrección manual de su stock.
+El sistema permitirá al empleador dar de alta, modificar y dar de baja productos, incluyendo la corrección manual de su stock.
 
 RF-02 —
 El sistema registrará y consultará el código de barras y el precio de venta de cada producto, disponibles para empleados y empleador. El costo de cada producto solo será visible para el empleador.
 
 RF-03 —
-El sistema consultara la cantidad disponible de cada producto.
+El sistema permitirá a empleados y empleador consultar la cantidad disponible de cada producto.
 
 RF-04 —
-El sistema permitira a los empleados registrar las ventas realizadas.
+El sistema permitirá a empleados y empleador registrar las ventas realizadas.
 
 RF-05 —
 El sistema identificará los productos mediante su código de barras al momento de realizar una venta. Los productos sin código de barras se identificarán mediante un código interno asignado por el negocio o buscándolos por nombre.
 
 RF-06 —
-El sistema permitira consultar cuáles son los productos más vendidos entre dos fechas indicadas.
+El sistema permitirá consultar cuáles son los productos más vendidos entre dos fechas indicadas.
 
 RF-07 —
-El sistema permitira consultar la cantidad de ventas realizadas entre dos fechas indicadas (o en un único día, si ambas fechas coinciden).
+El sistema permitirá consultar la cantidad de ventas realizadas entre dos fechas indicadas (o en un único día, si ambas fechas coinciden).
 
 RF-08 —
-El sistema permitira consultar el total vendido durante cada turno y el total correspondiente a ambos turnos.
+El sistema permitirá consultar el total vendido durante cada turno y el total correspondiente a ambos turnos.
 
 RF-09 —
-El sistema permitira consultar balances de caja correspondientes a los turnos y períodos determinados.
+El sistema permitirá consultar balances de caja correspondientes a los turnos y períodos determinados.
 
 RF-10 —
-El sistema permitira al empleador registrar y consultar los proveedores del negocio.
+El sistema permitirá al empleador registrar y consultar los proveedores del negocio.
 
 RF-11 —
 El sistema permitirá registrar los pagos realizados a los proveedores, en el momento del ingreso de mercadería o posteriormente, indicando medio de pago y monto, y asociándolos al ingreso que cancelan. También permitirá consultar los ingresos con pago pendiente de cada proveedor.
 
 RF-12 —
-El sistema permitira al empleador generar e imprimir reportes de la información registrada.
+El sistema permitirá al empleador imprimir los reportes de ventas, los balances de caja y el listado de stock. La lista de productos a reponer podrá imprimirla cualquier usuario.
 
 RF-13 —
-El sistema diferenciara las funcionalidades disponibles para los empleados y el empleador según su rol.
+El sistema diferenciará las funcionalidades disponibles para los empleados y el empleador según su rol.
 
 RF-14 —
 El sistema permitirá al empleador aplicar un aumento (o una baja) porcentual sobre el precio de costo de los productos de un proveedor, eligiendo todos sus productos, solo los de una categoría o seleccionándolos uno por uno, y recalculando el precio de venta de cada uno según su margen de ganancia.
@@ -107,7 +105,7 @@ El sistema permitirá a los usuarios cerrar sesión, para que otro usuario pueda
 
 ## 2. Requerimientos No Funcionales (RNF)
 RNF-01 —
-El sistema sera intuitivo y fácil de usar.
+El sistema será intuitivo y fácil de usar.
 
 RNF-02 —
 El sistema debe minimizar los errores de carga que generan faltantes o sobrantes de caja al finalizar el turno.

@@ -1,4 +1,4 @@
-## Caso de uso: Consultar stock y precios
+## CU-16 — Consultar stock y precios
 
 **Actores:** Empleado o Empleador (primario). <br>
 

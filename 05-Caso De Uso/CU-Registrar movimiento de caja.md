@@ -1,4 +1,4 @@
-## Caso de uso: Registrar movimiento de caja
+## CU-04 — Registrar movimiento de caja
 
 **Actores:** Empleado o Empleador (primario). <br>
 

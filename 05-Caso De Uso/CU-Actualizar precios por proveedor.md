@@ -1,4 +1,4 @@
-## Caso de uso: Actualizar precios por proveedor
+## CU-12 — Actualizar precios por proveedor
 
 **Actores:** Empleador (primario). <br>
 

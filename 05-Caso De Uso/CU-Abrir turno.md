@@ -1,4 +1,4 @@
-## Caso de uso: Abrir turno
+## CU-02 — Abrir turno
 
 **Actores:** Empleado o Empleador (primario). <br>
 

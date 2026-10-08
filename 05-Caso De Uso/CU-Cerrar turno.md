@@ -1,4 +1,4 @@
-## Caso de uso: Cerrar turno
+## CU-03 — Cerrar turno
 
 **Actores:** Empleado o Empleador (primario). <br>
 

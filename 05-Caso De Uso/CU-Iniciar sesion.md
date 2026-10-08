@@ -1,4 +1,4 @@
-## Caso de uso: Iniciar sesión
+## CU-01 — Iniciar sesión
 
 **Actores:** Empleado o Empleador (primario). <br>
 

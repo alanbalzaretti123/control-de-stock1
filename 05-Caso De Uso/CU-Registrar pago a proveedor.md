@@ -1,4 +1,4 @@
-## Caso de uso: Registrar pago a proveedor
+## CU-10 — Registrar pago a proveedor
 
 **Actores:** Empleado o Empleador (primario). <br>
 

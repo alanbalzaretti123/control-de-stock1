@@ -1,4 +1,4 @@
-## Caso de uso: Consultar reportes de ventas
+## CU-18 — Consultar reportes de ventas
 
 **Actores:** Empleador (primario). <br>
 

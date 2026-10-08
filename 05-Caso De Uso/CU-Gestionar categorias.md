@@ -1,4 +1,4 @@
-## Caso de uso: Gestionar categorías
+## CU-14 — Gestionar categorías
 
 **Actores:** Empleador (primario). <br>
 

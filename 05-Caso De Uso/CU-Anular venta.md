@@ -1,4 +1,4 @@
-## Caso de uso: Anular venta
+## CU-06 — Anular venta
 
 **Actores:** Empleador (primario). <br>
 

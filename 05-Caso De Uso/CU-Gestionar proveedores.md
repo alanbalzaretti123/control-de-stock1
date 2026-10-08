@@ -1,4 +1,4 @@
-## Caso de uso: Gestionar proveedores
+## CU-11 — Gestionar proveedores
 
 **Actores:** Empleador (primario). <br>
 

@@ -1,4 +1,4 @@
-## Caso de uso: Gestionar usuarios
+## CU-15 — Gestionar usuarios
 
 **Actores:** Empleador (primario). <br>
 

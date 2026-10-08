@@ -1,4 +1,4 @@
-## Caso de uso: Gestionar clientes
+## CU-08 — Gestionar clientes
 
 **Actores:** Empleado o Empleador (primario). <br>
 

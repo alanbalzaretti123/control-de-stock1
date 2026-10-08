@@ -1,4 +1,4 @@
-## Caso de uso: Gestionar productos
+## CU-13 — Gestionar productos
 
 **Actores:** Empleador (primario). <br>
 

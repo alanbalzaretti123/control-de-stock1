@@ -1,4 +1,4 @@
-## Caso de uso: Registrar pago de deuda (fiado)
+## CU-07 — Registrar pago de deuda (fiado)
 
 **Actores:** Empleado o Empleador (primario).
 

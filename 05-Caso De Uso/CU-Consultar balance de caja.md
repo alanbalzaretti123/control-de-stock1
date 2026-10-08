@@ -1,4 +1,4 @@
-## Caso de uso: Consultar balance de caja
+## CU-19 — Consultar balance de caja
 
 **Actores:** Empleado o Empleador (primario). <br>
 
