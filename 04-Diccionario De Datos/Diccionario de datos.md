@@ -95,7 +95,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | precioCosto | Costo de adquisición vigente del producto, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | precioVenta | Precio de venta vigente del producto al público, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | stockActual | Cantidad disponible en inventario, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| stockMinimo | Umbral mínimo que dispara la alerta de reposición, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| stockMinimo | Umbral de stock a partir del cual (stock actual menor o igual) el producto pasa a la lista de productos a reponer, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | fechaVencimiento | Fecha de vencimiento del producto, cuando corresponda. | — | Fecha | Fecha válida, posterior a la fecha de ingreso del producto |
 | idCliente | Número que identifica al cliente con cuenta de fiado; lo asigna el sistema al registrarlo. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | nombreCliente | Nombre del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |

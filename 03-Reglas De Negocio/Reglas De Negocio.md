@@ -120,3 +120,6 @@ La diferencia de caja de un turno se calculará como el efectivo contado menos e
 
 ### 07 — Saldo pendiente de un ingreso de mercadería
 El saldo pendiente de un ingreso se calculará como su monto total menos la sumatoria de los pagos al proveedor asociados a ese ingreso.
+
+### 08 — Producto a reponer
+Un producto requiere reposición cuando está activo y su stock actual es menor o igual a su stock mínimo.

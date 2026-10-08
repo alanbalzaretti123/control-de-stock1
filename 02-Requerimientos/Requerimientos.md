@@ -91,6 +91,12 @@ El sistema permitirá al empleador dar de alta, modificar y eliminar las categor
 RF-29 —
 El sistema permitirá al empleador anular una venta indicando el motivo, reponiendo el stock de los productos vendidos y revirtiendo su efecto en la caja o en la cuenta corriente del cliente.
 
+RF-30 —
+El sistema permitirá a empleados y empleador consultar e imprimir la lista de productos a reponer (productos activos cuyo stock actual es menor o igual a su stock mínimo), agrupada por proveedor y con filtro por proveedor o categoría.
+
+RF-31 —
+El sistema permitirá al empleador imprimir el listado de stock de los productos.
+
 ---
 
 ## 2. Requerimientos No Funcionales (RNF)
