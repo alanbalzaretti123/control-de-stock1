@@ -95,7 +95,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | precioCosto | Costo de adquisición vigente del producto, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | margenGanancia | Porcentaje que se aplica sobre el precio de costo para obtener el precio de venta; varía según el producto. | 5,2 | Numérico (decimal) | Continuo: mayor a −100 |
 | precioVenta | Precio de venta vigente del producto al público, por unidad o por kilogramo según su unidad de medida. Lo calcula el sistema a partir del costo y el margen, o lo fija el empleador manualmente. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| stockActual | Cantidad disponible en inventario, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| stockActual | Cantidad disponible en inventario, en unidades o kilogramos según la unidad de medida del producto. Puede quedar negativo si se vendió un producto sin stock registrado. | 10,3 | Numérico (decimal) | Continuo: {vi: −n; vf: n} |
 | stockMinimo | Umbral de stock a partir del cual (stock actual menor o igual) el producto pasa a la lista de productos a reponer, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | fechaVencimiento | Fecha de vencimiento del producto, cuando corresponda. | — | Fecha | Fecha válida, posterior a la fecha de ingreso del producto |
 | idCliente | Número que identifica al cliente con cuenta de fiado; lo asigna el sistema al registrarlo. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |

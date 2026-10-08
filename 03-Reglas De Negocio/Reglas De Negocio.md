@@ -14,7 +14,7 @@ El margen de ganancia aplicado al precio de venta puede variar según el product
 El negocio vende fiado únicamente a clientes del barrio registrados en el sistema. Cada cliente con fiado posee una cuenta corriente donde se registran los cargos (ventas fiadas) y los pagos que realiza.
 
 ### 05 — Pagos sobre la cuenta corriente
-El cliente puede cancelar su deuda en forma total o parcial. Los pagos se aplican sobre el saldo total de la cuenta corriente y no sobre una venta fiada en particular.
+El cliente puede cancelar su deuda en forma total o parcial. Los pagos se aplican sobre el saldo total de la cuenta corriente y no sobre una venta fiada en particular. Si al comprar fiado el cliente entrega una parte del dinero, la venta se registra completa como fiada y lo entregado se registra como un pago sobre su cuenta corriente.
 
 ### 06 — Cambio de turno
 Al cerrar un turno se retira todo el efectivo de la caja. El turno siguiente inicia con el monto de efectivo que se decida en ese momento.
@@ -27,6 +27,9 @@ Cada producto se vende por unidad o por kilogramo. En los productos por kilogram
 
 ### 09 — Productos sin código de barras
 Los productos que no tienen código de barras se identifican con un código interno asignado por el negocio al darlos de alta.
+
+### 10 — Venta sin stock registrado
+Se permite vender un producto aunque el stock registrado no alcance, ya que el producto puede estar físicamente en el local por un error de carga. En ese caso el stock queda en cero o negativo y el producto pasa a la lista de productos a reponer, donde el empleador lo revisa y corrige.
 
 ---
 
@@ -72,6 +75,9 @@ Solo el empleador puede anular una venta. La anulación es total (no se anulan p
 
 ### 14 — Anulación de una venta fiada
 No se puede anular una venta fiada si el saldo adeudado por el cliente es menor al total de esa venta (es decir, si el cliente ya pagó parte de ella).
+
+### 15 — Productos dados de baja
+No se pueden vender productos dados de baja (inactivos).
 
 ---
 
