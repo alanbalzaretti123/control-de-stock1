@@ -1,0 +1,249 @@
+@startuml diagrama-clases
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 60
+skinparam ranksep 70
+hide empty members
+hide circle
+
+
+' ===================== Enumeraciones =====================
+package "Enumeraciones" {
+  enum RolUsuario {
+    Empleador
+    Empleado
+  }
+  enum EstadoRegistro {
+    Activo
+    Inactivo
+  }
+  enum EstadoCliente {
+    Habilitado
+    Inhabilitado
+  }
+  enum TipoTurno {
+    Mañana
+    Tarde
+  }
+  enum EstadoTurno {
+    Abierto
+    Cerrado
+  }
+  enum MedioPago {
+    Efectivo
+    Transferencia
+  }
+  enum CondicionVenta {
+    Contado
+    Fiado
+  }
+  enum EstadoVenta {
+    Confirmada
+    Anulada
+  }
+  enum UnidadMedida {
+    Unidad
+    Kilogramo
+  }
+  enum TipoMovimiento {
+    Venta
+    PagoFiado
+    PagoProveedor
+    Retiro
+    Aporte
+    Anulacion
+  }
+}
+
+' ===================== Usuarios y caja =====================
+class Usuario {
+  - nombreUsuario: String {id}
+  - contraseña: String
+  - nombreCompleto: String
+  - rol: RolUsuario
+  - estadoUsuario: EstadoRegistro
+  + validarContraseña(contraseña: String): Boolean
+  + restablecerContraseña(nueva: String): void
+  + darDeBaja(): void
+  + reactivar(): void
+}
+
+class Turno {
+  - fechaTurno: Date {id}
+  - tipoTurno: TipoTurno {id}
+  - horaApertura: Time
+  - horaCierre: Time
+  - montoInicialCaja: Decimal
+  - montoContado: Decimal
+  - diferenciaCaja: Decimal
+  - estadoTurno: EstadoTurno
+  + calcularEfectivoEsperado(): Decimal
+  + cerrar(montoContado: Decimal): void
+}
+
+class MovimientoCaja {
+  - numeroMovimiento: Integer {id}
+  - fechaHoraMovimiento: DateTime
+  - tipoMovimiento: TipoMovimiento
+  - medioPago: MedioPago
+  - monto: Decimal
+  - motivo: String
+  + esEntrada(): Boolean
+}
+
+' ===================== Ventas =====================
+class Venta {
+  - numeroComprobante: Integer {id}
+  - fechaVenta: DateTime
+  - condicionVenta: CondicionVenta
+  - totalVenta: Decimal
+  - estadoVenta: EstadoVenta
+  - fechaHoraAnulacion: DateTime
+  - motivo: String
+  + agregarProducto(producto: Producto, cantidad: Decimal): void
+  + quitarProducto(producto: Producto): void
+  + calcularTotal(): Decimal
+  + registrarPago(medio: MedioPago, monto: Decimal): void
+  + confirmar(): void
+  + anular(usuario: Usuario, motivo: String): void
+}
+
+class DetalleVenta {
+  - cantidad: Decimal
+  - precioUnitario: Decimal
+  - costoUnitario: Decimal
+  - subtotal: Decimal
+  + calcularSubtotal(): Decimal
+}
+
+class DetallePago {
+  - medioPago: MedioPago {id}
+  - monto: Decimal
+}
+
+' ===================== Fiado =====================
+class Cliente {
+  - idCliente: Integer {id}
+  - nombreCliente: String
+  - apellidoCliente: String
+  - telefono: String
+  - saldoDeuda: Decimal
+  - estadoCliente: EstadoCliente
+  + estaHabilitado(): Boolean
+  + habilitar(): void
+  + inhabilitar(): void
+  + cargarDeuda(monto: Decimal): void
+  + descontarDeuda(monto: Decimal): void
+}
+
+class PagoFiado {
+  - numeroRecibo: Integer {id}
+  - fechaPago: Date
+  - montoTotal: Decimal
+  + calcularTotal(): Decimal
+}
+
+class MedioPagoFiado {
+  - medioPago: MedioPago {id}
+  - monto: Decimal
+}
+
+' ===================== Productos =====================
+class Producto {
+  - codigoBarras: String {id}
+  - nombreProducto: String
+  - descripcionProducto: String
+  - unidadMedida: UnidadMedida
+  - precioCosto: Decimal
+  - margenGanancia: Decimal
+  - precioVenta: Decimal
+  - stockActual: Decimal
+  - stockMinimo: Decimal
+  - estadoProducto: EstadoRegistro
+  + calcularPrecioVenta(): Decimal
+  + ajustarPrecioVenta(precio: Decimal): void
+  + actualizarCosto(porcentaje: Decimal): void
+  + descontarStock(cantidad: Decimal): void
+  + reponerStock(cantidad: Decimal): void
+  + requiereReposicion(): Boolean
+}
+
+class Categoria {
+  - idCategoria: Integer {id}
+  - nombreCategoria: String
+  - descripcionCategoria: String
+}
+
+' ===================== Proveedores y mercadería =====================
+class Proveedor {
+  - cuit: String {id}
+  - razonSocial: String
+  - telefono: String
+  - email: String
+  - estadoProveedor: EstadoRegistro
+  + darDeBaja(): void
+}
+
+class Direccion {
+  - calle: String
+  - numero: String
+  - codigoPostal: String
+  - localidad: String
+}
+
+class IngresoMercaderia {
+  - idIngreso: Integer {id}
+  - numeroRemito: String
+  - fechaIngreso: Date
+  - montoTotal: Decimal
+  + calcularSaldoPendiente(): Decimal
+}
+
+class DetalleIngreso {
+  - cantidad: Decimal
+}
+
+class PagoProveedor {
+  - idPagoProveedor: Integer {id}
+  - fechaPago: Date
+  - medioPago: MedioPago
+  - monto: Decimal
+  - concepto: String
+}
+
+' ===================== Relaciones =====================
+Turno "0..*" --> "1" Usuario : responsable
+Turno "1" *-- "0..*" MovimientoCaja : registra
+MovimientoCaja "0..*" --> "1" Usuario : registrado por
+MovimientoCaja "0..*" --> "0..1" Venta : origen
+MovimientoCaja "0..*" --> "0..1" PagoFiado : origen
+MovimientoCaja "0..1" --> "0..1" PagoProveedor : origen
+
+Venta "0..*" --> "1" Turno : pertenece a
+Venta "0..*" --> "1" Usuario : registrada por
+Venta "0..*" --> "0..1" Usuario : anulada por
+Venta "0..*" --> "0..1" Cliente : fiada a
+Venta "1" *-- "1..*" DetalleVenta : contiene
+Venta "1" *-- "0..*" DetallePago : se abona con
+DetalleVenta "0..*" --> "1" Producto : refiere a
+
+PagoFiado "0..*" --> "1" Cliente : abonado por
+PagoFiado "0..*" --> "1" Turno : cobrado en
+PagoFiado "0..*" --> "1" Usuario : registrado por
+PagoFiado "1" *-- "1..*" MedioPagoFiado : se abona con
+
+Producto "0..*" --> "1" Categoria : pertenece a
+Producto "0..*" --> "1" Proveedor : proveedor habitual
+
+Proveedor "1" *-- "0..1" Direccion : tiene
+
+IngresoMercaderia "0..*" --> "1" Proveedor : provisto por
+IngresoMercaderia "0..*" --> "1" Usuario : recibido por
+IngresoMercaderia "1" *-- "1..*" DetalleIngreso : contiene
+DetalleIngreso "0..*" --> "1" Producto : refiere a
+
+PagoProveedor "0..*" --> "1" Proveedor : abonado a
+PagoProveedor "0..*" --> "0..1" IngresoMercaderia : cancela
+PagoProveedor "0..*" --> "1" Turno : pagado en
+PagoProveedor "0..*" --> "1" Usuario : registrado por
+@enduml
