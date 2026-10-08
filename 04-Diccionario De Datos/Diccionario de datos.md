@@ -21,11 +21,11 @@ Listado organizado con las definiciones precisas y rigurosas de los datos del si
 
 Usuario = @nombreUsuario + contraseña + nombreCompleto + rol + estadoUsuario
 
-Categoria = @nombreCategoria + (descripcionCategoria)
+Categoria = @idCategoria + nombreCategoria + (descripcionCategoria)
 
 Proveedor = @cuit + razonSocial + (telefono) + (email) + (direccion) + estadoProveedor
 
-Producto = @codigoBarras + nombreProducto + (descripcionProducto) + nombreCategoria + cuit + unidadMedida + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
+Producto = @codigoBarras + nombreProducto + (descripcionProducto) + idCategoria + cuit + unidadMedida + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
 
 Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + saldoDeuda + estadoCliente
 
@@ -77,7 +77,8 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | contraseña | Contraseña almacenada cifrada (hash). | 255 | Alfanumérico | Texto libre |
 | nombreCompleto | Nombre y apellido del usuario. | 80 | Alfanumérico | Texto libre |
 | rol | Rol del usuario dentro del sistema, determina las funcionalidades habilitadas. | 15 | Alfanumérico | Discreto: {(D, Empleador); (E, Empleado)} |
-| nombreCategoria | Nombre del rubro/categoría del producto (ej.: comestibles, limpieza). | 50 | Alfanumérico | Texto libre |
+| idCategoria | Número que identifica una categoría; lo asigna el sistema. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
+| nombreCategoria | Nombre del rubro/categoría del producto (ej.: comestibles, limpieza); no puede repetirse. | 50 | Alfanumérico | Texto libre |
 | descripcionCategoria | Descripción de la categoría. | 150 | Alfanumérico | Texto libre |
 | cuit | CUIT del proveedor, utilizado como identificador del mismo. | 13 | Alfanumérico | Formato XX-XXXXXXXX-X |
 | razonSocial | Razón social del proveedor. | 100 | Alfanumérico | Texto libre |

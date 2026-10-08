@@ -58,6 +58,15 @@ El monto de un pago asociado a un ingreso de mercadería no podrá superar el sa
 ### 09 — Costos de la mercadería
 Solo el empleador puede ver y modificar el precio de costo de los productos. El ingreso de mercadería registra productos, cantidades e importe total del remito, sin costos unitarios; el empleador actualiza luego el precio de costo de cada producto desde la gestión de productos.
 
+### 10 — Nombre de usuario único
+No puede haber dos usuarios con el mismo nombre de usuario, y el nombre de usuario no puede modificarse una vez creado.
+
+### 11 — Empleador activo
+Debe existir siempre al menos un usuario con rol Empleador en estado activo.
+
+### 12 — Eliminación de categorías
+No se puede eliminar una categoría que tenga productos asociados.
+
 ---
 
 ### 3. Acciones Disparadores<br>

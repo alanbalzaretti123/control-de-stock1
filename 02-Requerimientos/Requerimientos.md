@@ -79,6 +79,15 @@ El sistema permitirá a empleados y empleador registrar el ingreso de mercaderí
 RF-25 —
 El sistema permitirá vender productos por peso (por ejemplo, fiambres), ingresando el peso en kilogramos y calculando el importe a partir del precio por kilogramo.
 
+RF-26 —
+El sistema permitirá al empleador dar de alta, modificar y dar de baja a los usuarios del sistema, asignándoles su rol (empleador o empleado).
+
+RF-27 —
+El sistema permitirá al empleador registrar y modificar los clientes que compran fiado, habilitarlos o inhabilitarlos para fiado y consultar su cuenta corriente (saldo adeudado, ventas fiadas y pagos realizados).
+
+RF-28 —
+El sistema permitirá al empleador dar de alta, modificar y eliminar las categorías de productos.
+
 ---
 
 ## 2. Requerimientos No Funcionales (RNF)
