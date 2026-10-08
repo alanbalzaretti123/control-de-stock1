@@ -45,7 +45,7 @@ MedioPagoFiado = @numeroRecibo + @medioPago + monto
 
 IngresoMercaderia = @idIngreso + cuit + (numeroRemito) + fechaIngreso + nombreUsuario + 1{DetalleIngreso}n + montoTotal
 
-DetalleIngreso = @idIngreso + @codigoBarras + cantidad + (costoUnitario)
+DetalleIngreso = @idIngreso + @codigoBarras + cantidad
 
 PagoProveedor = @idPagoProveedor + cuit + (idIngreso) + fechaPago + fechaTurno + tipoTurno + nombreUsuario + medioPago + monto + (concepto)
 
@@ -116,7 +116,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | totalVenta | Importe total de la venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | cantidad | Cantidad de unidades vendidas o ingresadas del producto. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | precioUnitario | Precio unitario de venta del producto al momento de la operación. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| costoUnitario | Costo unitario del producto al momento de la operación (venta o ingreso). En un ingreso queda vacío hasta que el empleador lo completa. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| costoUnitario | Costo unitario del producto al momento de la venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | subtotal | Subtotal de la línea (cantidad x precioUnitario). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | medioPago | Medio de pago utilizado en una venta, un pago de fiado, un pago a proveedor o un movimiento de caja. | 15 | Alfanumérico | Discreto: {(E, efectivo); (T, transferencia)} |
 | fechaPago | Fecha en la que se realizó un pago a un proveedor o un pago de fiado. | — | Fecha | Fecha válida, no posterior a la fecha actual |

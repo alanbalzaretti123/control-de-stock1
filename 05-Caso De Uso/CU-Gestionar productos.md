@@ -12,7 +12,7 @@
 
 **Caminos alternativos:** <br>
 **1.a** El empleador indica que desea modificar un producto existente. <br>
-1.a.1 El sistema muestra los datos actuales del producto y solicita los campos a editar. <br>
+1.a.1 El sistema muestra los datos actuales del producto y solicita los campos a editar (por ejemplo, el precio de costo luego de un ingreso de mercadería). <br>
 1.a.2 El empleador ingresa los nuevos valores y confirma. <br>
 1.a.3 El sistema actualiza el producto. Fin del caso de uso. <br>
 **1.b** El empleador indica que desea dar de baja un producto existente. <br>

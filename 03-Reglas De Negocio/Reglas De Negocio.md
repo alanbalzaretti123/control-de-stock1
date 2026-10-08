@@ -50,7 +50,7 @@ Al cerrar el turno, el usuario debe ingresar el efectivo contado antes de que el
 El monto de un pago asociado a un ingreso de mercadería no podrá superar el saldo pendiente de ese ingreso.
 
 ### 09 — Costos de la mercadería
-Solo el empleador puede ver, registrar y modificar los costos unitarios de los productos. Cuando un empleado registra un ingreso de mercadería, carga los productos y cantidades recibidas, y los costos unitarios quedan pendientes hasta que el empleador los complete.
+Solo el empleador puede ver y modificar el precio de costo de los productos. El ingreso de mercadería registra productos, cantidades e importe total del remito, sin costos unitarios; el empleador actualiza luego el precio de costo de cada producto desde la gestión de productos.
 
 ---
 

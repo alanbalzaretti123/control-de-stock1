@@ -76,9 +76,6 @@ El sistema permitirá registrar retiros y aportes de dinero en la caja del turno
 RF-24 —
 El sistema permitirá a empleados y empleador registrar el ingreso de mercadería, indicando proveedor, número de remito (si lo hay), productos recibidos, cantidades e importe total del remito, actualizando el stock de cada producto.
 
-RF-25 —
-El sistema permitirá al empleador completar los costos unitarios de los productos de un ingreso de mercadería, actualizando el precio de costo vigente de cada producto.
-
 ---
 
 ## 2. Requerimientos No Funcionales (RNF)
