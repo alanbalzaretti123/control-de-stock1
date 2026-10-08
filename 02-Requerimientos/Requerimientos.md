@@ -83,7 +83,7 @@ RF-26 —
 El sistema permitirá al empleador dar de alta, modificar y dar de baja a los usuarios del sistema, asignándoles su rol (empleador o empleado).
 
 RF-27 —
-El sistema permitirá al empleador registrar y modificar los clientes que compran fiado, habilitarlos o inhabilitarlos para fiado y consultar su cuenta corriente (saldo adeudado, ventas fiadas y pagos realizados).
+El sistema permitirá a empleados y empleador dar de alta a los clientes que compran fiado. Además, permitirá al empleador modificar sus datos, habilitarlos o inhabilitarlos para fiado y consultar su cuenta corriente (saldo adeudado, ventas fiadas y pagos realizados).
 
 RF-28 —
 El sistema permitirá al empleador dar de alta, modificar y eliminar las categorías de productos.
