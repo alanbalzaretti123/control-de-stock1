@@ -14,7 +14,7 @@
 
 **Caminos alternativos:** <br>
 **1.a** El empleador indica que desea modificar un producto existente. <br>
-1.a.1 El sistema muestra los datos actuales del producto y solicita los campos a editar (por ejemplo, el precio de costo luego de un ingreso de mercadería). <br>
+1.a.1 El sistema muestra los datos actuales del producto y solicita los campos a editar (por ejemplo, el precio de costo luego de un ingreso de mercadería, o el stock actual para corregir una diferencia con el stock real). <br>
 1.a.2 El empleador ingresa los nuevos valores y confirma. <br>
 1.a.3 Si se modificó el precio de costo o el margen, el sistema recalcula el precio de venta y lo muestra para su confirmación (el empleador puede ajustarlo como en 5.a). <br>
 1.a.4 El sistema actualiza el producto. Fin del caso de uso. <br>

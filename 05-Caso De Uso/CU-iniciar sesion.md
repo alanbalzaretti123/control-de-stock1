@@ -20,4 +20,4 @@ El usuario debe estar en estado activo (no dado de baja). <br>
 
 **Escenario de fracaso:** el usuario no puede acceder por ingresar credenciales incorrectas o por tener su cuenta dada de baja. <br>
 
-**Postcondiciones:** el usuario queda autenticado en el sistema, con acceso a las funcionalidades habilitadas según su rol.
+**Postcondiciones:** el usuario queda autenticado en el sistema, con acceso a las funcionalidades habilitadas según su rol, hasta que cierre sesión. Al cerrar sesión, el sistema vuelve a solicitar usuario y contraseña.

@@ -5,7 +5,7 @@
 1. Requerimientos funcionales
 
 RF-01 —
-El sistema permitira al empleador dar de alta, modificar y dar de baja productos.
+El sistema permitira al empleador dar de alta, modificar y dar de baja productos, incluyendo la corrección manual de su stock.
 
 RF-02 —
 El sistema registrará y consultará el código de barras y el precio de venta de cada producto, disponibles para empleados y empleador. El costo de cada producto solo será visible para el empleador.
@@ -99,6 +99,9 @@ El sistema permitirá al empleador imprimir el listado de stock de los productos
 
 RF-32 —
 El sistema calculará el precio de venta de cada producto a partir de su precio de costo y su margen de ganancia, redondeado al múltiplo de $10 superior. El empleador podrá ajustar manualmente el precio de venta, en cuyo caso el sistema recalculará el margen de ganancia.
+
+RF-33 —
+El sistema permitirá a los usuarios cerrar sesión, para que otro usuario pueda ingresar con su propia cuenta en la misma computadora.
 
 ---
 
