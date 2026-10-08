@@ -20,10 +20,10 @@ RF-05 —
 El sistema identificará los productos mediante su código de barras al momento de realizar una venta. Los productos sin código de barras se identificarán mediante un código interno asignado por el negocio o buscándolos por nombre.
 
 RF-06 —
-El sistema permitira consultar cuáles son los productos más vendidos.
+El sistema permitira consultar cuáles son los productos más vendidos entre dos fechas indicadas.
 
 RF-07 —
-El sistema permitira consultar la cantidad de ventas realizadas en una fecha determinada.
+El sistema permitira consultar la cantidad de ventas realizadas entre dos fechas indicadas (o en un único día, si ambas fechas coinciden).
 
 RF-08 —
 El sistema permitira consultar el total vendido durante cada turno y el total correspondiente a ambos turnos.

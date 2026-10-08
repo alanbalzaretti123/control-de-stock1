@@ -5,8 +5,8 @@
 **Precondiciones:** el usuario debe estar logueado con rol Empleador. <br>
 
 **Camino básico:** <br>
-1. El empleador indica el tipo de reporte que desea consultar (productos más vendidos, ventas realizadas en una fecha, o total vendido por turno) y el filtro correspondiente (fecha o turno). <br>
-2. El sistema calcula y muestra el resultado: para productos más vendidos, el nombre y la cantidad total vendida de cada producto; para ventas por fecha, la cantidad de ventas realizadas en la fecha indicada; para total por turno, el total vendido en efectivo, el total por transferencia y el total general de ese turno. <br>
+1. El empleador indica el tipo de reporte que desea consultar (productos más vendidos, cantidad de ventas, o total vendido por turno) y el filtro correspondiente: fecha desde y fecha hasta para los productos más vendidos y la cantidad de ventas (pueden coincidir para consultar un único día), o el turno para el total por turno. <br>
+2. El sistema calcula y muestra el resultado: para productos más vendidos, el nombre y la cantidad total vendida de cada producto en el período indicado; para cantidad de ventas, la cantidad de ventas no anuladas realizadas en el período indicado; para total por turno, el total vendido en efectivo, el total por transferencia y el total general de ese turno. <br>
 
 **Caminos alternativos:** <br>
 **2.a** No hay datos para el filtro solicitado. <br>
