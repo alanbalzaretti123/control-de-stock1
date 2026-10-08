@@ -31,7 +31,7 @@ Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + saldoDeuda
 
 Turno = @fechaTurno + @tipoTurno + nombreUsuario + horaApertura + (horaCierre) + montoInicialCaja + (montoContado) + (diferenciaCaja) + estadoTurno
 
-Venta = @numeroComprobante + fechaVenta + fechaTurno + tipoTurno + nombreUsuario + condicionVenta + (idCliente) + 1{DetalleVenta}n + 0{DetallePago}n + totalVenta + estadoVenta
+Venta = @numeroComprobante + fechaVenta + fechaTurno + tipoTurno + nombreUsuario + condicionVenta + (idCliente) + 1{DetalleVenta}n + 0{DetallePago}n + totalVenta + estadoVenta + (fechaHoraAnulacion + nombreUsuarioAnulacion + motivo)
 
 DetalleVenta = @numeroComprobante + @codigoBarras + cantidad + precioUnitario + costoUnitario + subtotal
 
@@ -63,7 +63,7 @@ Dato elemental cuyo valor se elige de un conjunto cerrado de alternativas:
     condicionVenta = [ contado | fiado ]
     unidadMedida = [ unidad | kilogramo ]
     estadoTurno = [ abierto | cerrado ]
-    tipoMovimiento = [ venta | pagoFiado | pagoProveedor | retiro | aporte ]
+    tipoMovimiento = [ venta | pagoFiado | pagoProveedor | retiro | aporte | anulacion ]
 
 ---
 
@@ -111,11 +111,13 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | estadoTurno | Indica si el turno está abierto (admite operaciones) o cerrado. | — | Alfanumérico | Dominio {(A, abierto); (C, cerrado)} |
 | numeroMovimiento | Número que identifica un movimiento de caja. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaHoraMovimiento | Fecha y hora en que se registró el movimiento de caja. | — | Fecha/Hora | Fecha y hora válida, no posterior al momento actual |
-| tipoMovimiento | Origen del movimiento de caja. Venta, pago de fiado y aporte son entradas; pago a proveedor y retiro son salidas. | 15 | Alfanumérico | Dominio {(V, venta); (F, pagoFiado); (P, pagoProveedor); (R, retiro); (A, aporte)} |
-| motivo | Motivo de un retiro o aporte de dinero. | 150 | Alfanumérico | Texto libre |
+| tipoMovimiento | Origen del movimiento de caja. Venta, pago de fiado y aporte son entradas; pago a proveedor, retiro y anulación de venta son salidas. | 15 | Alfanumérico | Dominio {(V, venta); (F, pagoFiado); (P, pagoProveedor); (R, retiro); (A, aporte); (N, anulacion)} |
+| motivo | Motivo de un retiro o aporte de dinero, o de la anulación de una venta. | 150 | Alfanumérico | Texto libre |
 | numeroComprobante | Número de comprobante/ticket asociado a una venta. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaVenta | Fecha y hora de la venta. | — | Fecha/Hora | Fecha y hora válida, no posterior al momento actual |
 | condicionVenta | Indica si la venta se abonó en el momento (contado) o se cargó a la cuenta corriente del cliente (fiado). | — | Alfanumérico | Dominio {(C, contado); (F, fiado)} |
+| fechaHoraAnulacion | Fecha y hora en que se anuló la venta. | — | Fecha/Hora | Fecha y hora válida, no anterior a la fecha de la venta |
+| nombreUsuarioAnulacion | Nombre de usuario del empleador que anuló la venta. | 30 | Alfanumérico | Texto libre |
 | totalVenta | Importe total de la venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | cantidad | Cantidad vendida o ingresada del producto: unidades (número entero) o kilogramos (con hasta 3 decimales) según su unidad de medida. | 10,3 | Numérico (decimal) | Continuo: mayor a 0 |
 | precioUnitario | Precio de venta del producto (por unidad o por kilogramo) al momento de la operación. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |

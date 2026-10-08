@@ -88,6 +88,9 @@ El sistema permitirá a empleados y empleador dar de alta a los clientes que com
 RF-28 —
 El sistema permitirá al empleador dar de alta, modificar y eliminar las categorías de productos.
 
+RF-29 —
+El sistema permitirá al empleador anular una venta indicando el motivo, reponiendo el stock de los productos vendidos y revirtiendo su efecto en la caja o en la cuenta corriente del cliente.
+
 ---
 
 ## 2. Requerimientos No Funcionales (RNF)

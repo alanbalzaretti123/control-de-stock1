@@ -44,7 +44,7 @@ El monto de un pago registrado sobre la cuenta corriente no podrá superar el sa
 Solo puede existir un turno abierto a la vez. No se podrá abrir un turno nuevo sin haber cerrado el anterior.
 
 ### 05 — Operaciones con turno abierto
-No se podrán registrar ventas, pagos de fiado, pagos a proveedores, retiros ni aportes si no hay un turno abierto.
+No se podrán registrar ventas, anulaciones de ventas, pagos de fiado, pagos a proveedores, retiros ni aportes si no hay un turno abierto.
 
 ### 06 — Turno cerrado
 Una vez cerrado, un turno no puede modificarse ni se le pueden registrar nuevas operaciones.
@@ -67,6 +67,12 @@ Debe existir siempre al menos un usuario con rol Empleador en estado activo.
 ### 12 — Eliminación de categorías
 No se puede eliminar una categoría que tenga productos asociados.
 
+### 13 — Anulación de ventas
+Solo el empleador puede anular una venta. La anulación es total (no se anulan productos sueltos de una venta); para corregir una venta se la anula y se registra una nueva. Una venta anulada no se elimina: queda registrada con su motivo, fecha y usuario que la anuló.
+
+### 14 — Anulación de una venta fiada
+No se puede anular una venta fiada si el saldo adeudado por el cliente es menor al total de esa venta (es decir, si el cliente ya pagó parte de ella).
+
 ---
 
 ### 3. Acciones Disparadores<br>
@@ -88,6 +94,9 @@ Al cerrar un turno el sistema calcula el efectivo esperado, lo compara con el ef
 ### 06 — Pago a proveedor
 Al registrar un pago a un proveedor se reduce el saldo pendiente del ingreso asociado (si lo hay) y se genera un movimiento de salida de caja en el turno abierto con su medio de pago. Solo los pagos en efectivo reducen el efectivo esperado de la caja.
 
+### 07 — Anulación de venta
+Al anular una venta se repone el stock de los productos vendidos. Si la venta fue de contado, se genera en el turno abierto un movimiento de salida de caja por cada medio de pago con el que se abonó, por el mismo monto. Si fue fiada, su total deja de sumar al saldo de la cuenta corriente del cliente.
+
 ---
 
 ### 4. Cálculos<br>
@@ -95,16 +104,16 @@ Al registrar un pago a un proveedor se reduce el saldo pendiente del ingreso aso
 La ganancia bruta obtenida por un producto se determinará a partir de la diferencia entre su precio de venta y su precio de costo.
 
 ### 02 — Total de ventas por turno
-El total vendido de un turno se calculará como la sumatoria de los importes totales (totalVenta) de todas las ventas registradas durante dicho turno.
+El total vendido de un turno se calculará como la sumatoria de los importes totales (totalVenta) de todas las ventas no anuladas registradas durante dicho turno.
 
 ### 03 — Total de ventas de un período
-El total facturado durante un período se calculará como la sumatoria de los importes totales (totalVenta) de todas las ventas registradas dentro de dicho período.
+El total vendido durante un período se calculará como la sumatoria de los importes totales (totalVenta) de todas las ventas no anuladas registradas dentro de dicho período.
 
 ### 04 — Saldo de la cuenta corriente
-El saldo adeudado por un cliente se calculará como la sumatoria de los totales de sus ventas fiadas menos la sumatoria de los pagos que realizó sobre su cuenta corriente.
+El saldo adeudado por un cliente se calculará como la sumatoria de los totales de sus ventas fiadas no anuladas menos la sumatoria de los pagos que realizó sobre su cuenta corriente.
 
 ### 05 — Efectivo esperado del turno
-El efectivo esperado al cierre de un turno se calculará como el monto inicial de caja más los movimientos de entrada en efectivo (ventas de contado, pagos de fiado y aportes) menos los movimientos de salida en efectivo (pagos a proveedores y retiros) registrados en ese turno.
+El efectivo esperado al cierre de un turno se calculará como el monto inicial de caja más los movimientos de entrada en efectivo (ventas de contado, pagos de fiado y aportes) menos los movimientos de salida en efectivo (pagos a proveedores, retiros y anulaciones de ventas) registrados en ese turno.
 
 ### 06 — Diferencia de caja
 La diferencia de caja de un turno se calculará como el efectivo contado menos el efectivo esperado. Un valor positivo indica un sobrante y un valor negativo, un faltante.
