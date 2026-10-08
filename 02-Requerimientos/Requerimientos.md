@@ -17,7 +17,7 @@ RF-04 —
 El sistema permitira a los empleados registrar las ventas realizadas.
 
 RF-05 —
-El sistema identificara los productos mediante su código de barras al momento de realizar una venta.
+El sistema identificará los productos mediante su código de barras al momento de realizar una venta. Los productos sin código de barras se identificarán mediante un código interno asignado por el negocio o buscándolos por nombre.
 
 RF-06 —
 El sistema permitira consultar cuáles son los productos más vendidos.
@@ -75,6 +75,9 @@ El sistema permitirá registrar retiros y aportes de dinero en la caja del turno
 
 RF-24 —
 El sistema permitirá a empleados y empleador registrar el ingreso de mercadería, indicando proveedor, número de remito (si lo hay), productos recibidos, cantidades e importe total del remito, actualizando el stock de cada producto.
+
+RF-25 —
+El sistema permitirá vender productos por peso (por ejemplo, fiambres), ingresando el peso en kilogramos y calculando el importe a partir del precio por kilogramo.
 
 ---
 

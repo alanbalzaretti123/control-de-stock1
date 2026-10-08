@@ -6,7 +6,7 @@
 
 **Camino básico** (alta de producto): <br>
 1. El empleador indica que desea dar de alta un nuevo producto. <br>
-2. El sistema solicita código de barras, nombre, descripción (opcional), categoría, proveedor, precio de costo, precio de venta, stock inicial, stock mínimo y fecha de vencimiento (opcional). <br>
+2. El sistema solicita código de barras (o código interno si el producto no tiene), nombre, descripción (opcional), categoría, proveedor, unidad de medida (unidad o kilogramo), precio de costo, precio de venta, stock inicial, stock mínimo y fecha de vencimiento (opcional). <br>
 3. El empleador completa los datos y confirma. <br>
 4. El sistema valida que el código de barras no esté registrado previamente y, si es válido, da de alta el producto en el catálogo. <br>
 

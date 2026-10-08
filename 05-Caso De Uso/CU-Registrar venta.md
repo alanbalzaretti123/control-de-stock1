@@ -16,10 +16,17 @@
 6. El sistema registra el pago, descuenta el stock de cada producto vendido, genera el comprobante y registra un movimiento de caja por cada medio de pago en el turno abierto.
 
 **Caminos alternativos:**<br>
+**1.a** El producto no tiene código de barras.<br>
+  1.a.1 El usuario busca el producto por nombre o ingresa su código interno.<br>
+  1.a.2 El sistema muestra los productos que coinciden y el usuario selecciona el que desea vender. Continúa en el paso 2.<br>
 **2.a** El código de barras ingresado no corresponde a ningún producto registrado.<br>
   2.a.1 El sistema informa que el producto no fue encontrado y no agrega ninguna línea por ese código. Vuelve al paso 1.<br>
 **2.b** El producto no tiene stock suficiente para la cantidad solicitada.<br>
   2.b.1 El sistema agrega la línea igual, dejando el stock del producto en cero o negativo, y registra un aviso de diferencia de stock para que el empleador lo revise más adelante.<br>
+**2.c** El producto se vende por kilogramo.<br>
+  2.c.1 El sistema solicita el peso vendido.<br>
+  2.c.2 El usuario ingresa el peso en kilogramos (por ejemplo, 0,250).<br>
+  2.c.3 El sistema calcula el subtotal como el peso por el precio por kilogramo y agrega la línea a la venta. Vuelve al paso 1.<br>
 **5.a** El usuario indica que la venta es fiada e indica el cliente correspondiente.<br>
   5.a.1 El sistema muestra el saldo adeudado del cliente y verifica que esté habilitado para fiado; si está inhabilitado, informa que no puede otorgarse el fiado y finaliza sin registrar la venta; caso contrario, descuenta el stock, genera un cargo por el total de la venta en la cuenta corriente del cliente y no incorpora el importe al balance de caja. Fin del caso de uso.<br>
 **5.b** El usuario indica que el pago se realiza combinando más de un medio de pago, ingresando el monto correspondiente a cada uno.<br>

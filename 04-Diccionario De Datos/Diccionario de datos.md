@@ -25,7 +25,7 @@ Categoria = @nombreCategoria + (descripcionCategoria)
 
 Proveedor = @cuit + razonSocial + (telefono) + (email) + (direccion) + estadoProveedor
 
-Producto = @codigoBarras + nombreProducto + (descripcionProducto) + nombreCategoria + cuit + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
+Producto = @codigoBarras + nombreProducto + (descripcionProducto) + nombreCategoria + cuit + unidadMedida + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
 
 Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + saldoDeuda + estadoCliente
 
@@ -61,6 +61,7 @@ Dato elemental cuyo valor se elige de un conjunto cerrado de alternativas:
     estado = [ activo | inactivo ]
     estadoVenta = [ confirmada | anulada ]
     condicionVenta = [ contado | fiado ]
+    unidadMedida = [ unidad | kilogramo ]
     estadoTurno = [ abierto | cerrado ]
     tipoMovimiento = [ venta | pagoFiado | pagoProveedor | retiro | aporte ]
 
@@ -86,13 +87,14 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | numero | Número o altura del domicilio. | 10 | Alfanumérico | Texto libre |
 | codigoPostal | Código postal del domicilio. | 8 | Alfanumérico | Texto libre |
 | localidad | Localidad del domicilio. | 50 | Alfanumérico | Texto libre |
-| codigoBarras | Código de barras del producto, utilizado como identificador del mismo. Identifica una combinación específica de marca y presentación. Se guarda como texto para no perder los ceros a la izquierda y admitir códigos de distinta longitud (EAN-8, UPC-12, EAN-13 o códigos internos). | 20 | Alfanumérico | Solo dígitos |
+| codigoBarras | Código de barras del producto, utilizado como identificador del mismo. Identifica una combinación específica de marca y presentación. Se guarda como texto para no perder los ceros a la izquierda y admitir códigos de distinta longitud (EAN-8, UPC-12, EAN-13). Los productos sin código de barras llevan un código interno asignado por el negocio (ej.: INT-0001). | 20 | Alfanumérico | Dígitos del código de barras, o código interno |
 | nombreProducto | Nombre del producto. | 100 | Alfanumérico | Texto libre |
 | descripcionProducto | Descripción del producto. | 200 | Alfanumérico | Texto libre |
-| precioCosto | Costo de adquisición vigente del producto. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| precioVenta | Precio de venta vigente del producto al público. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| stockActual | Cantidad disponible en inventario. | — | Numérico (entero) | Continuo: {vi: 0; vf: n} |
-| stockMinimo | Umbral mínimo que dispara la alerta de reposición. | — | Numérico (entero) | Continuo: {vi: 0; vf: n} |
+| unidadMedida | Indica si el producto se vende por unidad o por kilogramo (por ejemplo, fiambres). | — | Alfanumérico | Dominio {(U, unidad); (K, kilogramo)} |
+| precioCosto | Costo de adquisición vigente del producto, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| precioVenta | Precio de venta vigente del producto al público, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| stockActual | Cantidad disponible en inventario, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| stockMinimo | Umbral mínimo que dispara la alerta de reposición, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | fechaVencimiento | Fecha de vencimiento del producto, cuando corresponda. | — | Fecha | Fecha válida, posterior a la fecha de ingreso del producto |
 | idCliente | Número que identifica al cliente con cuenta de fiado; lo asigna el sistema al registrarlo. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | nombreCliente | Nombre del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |
@@ -114,8 +116,8 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | fechaVenta | Fecha y hora de la venta. | — | Fecha/Hora | Fecha y hora válida, no posterior al momento actual |
 | condicionVenta | Indica si la venta se abonó en el momento (contado) o se cargó a la cuenta corriente del cliente (fiado). | — | Alfanumérico | Dominio {(C, contado); (F, fiado)} |
 | totalVenta | Importe total de la venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| cantidad | Cantidad de unidades vendidas o ingresadas del producto. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
-| precioUnitario | Precio unitario de venta del producto al momento de la operación. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| cantidad | Cantidad vendida o ingresada del producto: unidades (número entero) o kilogramos (con hasta 3 decimales) según su unidad de medida. | 10,3 | Numérico (decimal) | Continuo: mayor a 0 |
+| precioUnitario | Precio de venta del producto (por unidad o por kilogramo) al momento de la operación. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | costoUnitario | Costo unitario del producto al momento de la venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | subtotal | Subtotal de la línea (cantidad x precioUnitario). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | medioPago | Medio de pago utilizado en una venta, un pago de fiado, un pago a proveedor o un movimiento de caja. | 15 | Alfanumérico | Discreto: {(E, efectivo); (T, transferencia)} |

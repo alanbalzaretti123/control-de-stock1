@@ -22,6 +22,12 @@ Al cerrar un turno se retira todo el efectivo de la caja. El turno siguiente ini
 ### 07 — Pago a proveedores
 La mercadería recibida puede pagarse en el momento o quedar pendiente. El pago en efectivo se realiza con dinero de la caja; si el efectivo no alcanza, se avisa al empleador y se paga por transferencia. Un ingreso puede pagarse en uno o más pagos.
 
+### 08 — Unidad de medida de los productos
+Cada producto se vende por unidad o por kilogramo. En los productos por kilogramo, el precio de venta, el precio de costo y el stock se expresan por kilogramo, y en cada venta se ingresa el peso vendido.
+
+### 09 — Productos sin código de barras
+Los productos que no tienen código de barras se identifican con un código interno asignado por el negocio al darlos de alta.
+
 ---
 
 ### 2. Restricciones<br>
