@@ -27,7 +27,7 @@ Proveedor = @cuit + razonSocial + (telefono) + (email) + (direccion) + estadoPro
 
 Producto = @codigoBarras + nombreProducto + (descripcionProducto) + nombreCategoria + cuit + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
 
-Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + limiteCredito + saldoDeuda
+Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + saldoDeuda + estadoCliente
 
 Turno = @fechaTurno + @tipoTurno + nombreUsuario + horaApertura + (horaCierre) + montoInicialCaja + (montoContado) + (diferenciaCaja) + estadoTurno
 
@@ -45,7 +45,7 @@ MedioPagoFiado = @numeroRecibo + @medioPago + monto
 
 IngresoMercaderia = @idIngreso + cuit + (numeroRemito) + fechaIngreso + nombreUsuario + 1{DetalleIngreso}n + montoTotal
 
-DetalleIngreso = @idIngreso + @codigoBarras + cantidad + costoUnitario
+DetalleIngreso = @idIngreso + @codigoBarras + cantidad + (costoUnitario)
 
 PagoProveedor = @idPagoProveedor + cuit + (idIngreso) + fechaPago + fechaTurno + tipoTurno + nombreUsuario + medioPago + monto + (concepto)
 
@@ -97,7 +97,6 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | idCliente | Número que identifica al cliente con cuenta de fiado; lo asigna el sistema al registrarlo. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | nombreCliente | Nombre del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |
 | apellidoCliente | Apellido del cliente con cuenta de fiado. | 50 | Alfanumérico | Texto libre |
-| limiteCredito | Monto máximo que el cliente puede adeudar en su cuenta corriente; lo define el empleador. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | saldoDeuda | Saldo actual de la cuenta corriente del cliente (ventas fiadas menos pagos realizados). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | fechaTurno | Fecha en la que se abrió el turno. Si el turno termina después de la medianoche, sus operaciones conservan esta fecha. | — | Fecha | Fecha válida, no posterior a la fecha actual |
 | tipoTurno | Franja horaria del turno. | 10 | Alfanumérico | Discreto: {(M, mañana); (T, tarde)} |
@@ -117,7 +116,7 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | totalVenta | Importe total de la venta. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | cantidad | Cantidad de unidades vendidas o ingresadas del producto. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | precioUnitario | Precio unitario de venta del producto al momento de la operación. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| costoUnitario | Costo unitario del producto al momento de la operación (venta o ingreso). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| costoUnitario | Costo unitario del producto al momento de la operación (venta o ingreso). En un ingreso queda vacío hasta que el empleador lo completa. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | subtotal | Subtotal de la línea (cantidad x precioUnitario). | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | medioPago | Medio de pago utilizado en una venta, un pago de fiado, un pago a proveedor o un movimiento de caja. | 15 | Alfanumérico | Discreto: {(E, efectivo); (T, transferencia)} |
 | fechaPago | Fecha en la que se realizó un pago a un proveedor o un pago de fiado. | — | Fecha | Fecha válida, no posterior a la fecha actual |
@@ -126,10 +125,11 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | numeroRemito | Número del remito entregado por el proveedor junto con la mercadería, cuando lo hay (ej.: 0001-00012345). | 20 | Alfanumérico | Texto libre |
 | idPagoProveedor | Número que identifica un pago realizado a un proveedor; lo asigna el sistema. | — | Numérico (entero) | Continuo: {vi: 1; vf: n} |
 | fechaIngreso | Fecha en la que se recibió la mercadería. | — | Fecha | Fecha válida, no posterior a la fecha actual |
-| montoTotal | Importe total de un ingreso de mercadería (sumatoria de cantidad × costo unitario) o de un pago de fiado. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| montoTotal | Importe total de un ingreso de mercadería, según el remito o comprobante del proveedor, o de un pago de fiado. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | monto | Importe abonado a un proveedor, correspondiente a una línea de pago de una venta o de un fiado, o de un movimiento de caja. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | concepto | Detalle o motivo del pago realizado al proveedor, obligatorio cuando el pago no está asociado a un ingreso de mercadería. | 150 | Alfanumérico | Texto libre |
 | estadoUsuario | Indica si el usuario puede acceder al sistema (activo) o fue dado de baja, por ejemplo al dejar de trabajar en el negocio (inactivo). | — | Booleano | Dominio {(1, activo); (0, inactivo)} |
+| estadoCliente | Indica si el empleador habilita al cliente para comprar fiado (habilitado) o no (inhabilitado). | — | Booleano | Dominio {(1, habilitado); (0, inhabilitado)} |
 | estadoProveedor | Indica si al proveedor se le siguen realizando pedidos y pagos (activo) o se dejó de operar con él (inactivo). | — | Booleano | Dominio {(1, activo); (0, inactivo)} |
 | estadoProducto | Indica si el producto se sigue comercializando y puede venderse (activo) o fue discontinuado del catálogo (inactivo), sin borrarse del historial de ventas pasadas. | — | Booleano | Dominio {(1, activo); (0, inactivo)} |
 | estadoVenta | Estado de la venta: confirmada o anulada. La deuda de una venta fiada no se controla por venta sino en la cuenta corriente del cliente. | — | Alfanumérico | Dominio {(C, confirmada); (A, anulada)} |

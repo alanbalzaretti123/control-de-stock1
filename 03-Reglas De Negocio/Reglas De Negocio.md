@@ -5,7 +5,7 @@
 El negocio se organiza en turno mañana y turno tarde. La fecha de un turno es la fecha en que se abrió, aunque el turno termine después de la medianoche; todas las operaciones registradas mientras está abierto pertenecen a esa fecha.
 
 ### 02 — Medio de pago
-Una venta puede ser abonada mediante efectivo o transferencia, o mediante una combinación de ambos dentro de una misma operación.
+Una venta puede ser abonada mediante efectivo o transferencia, o mediante una combinación de ambos dentro de una misma operación. No se aceptan pagos con tarjeta ni con QR. Una venta también puede quedar fiada (ver hecho 04).
 
 ### 03 — Margen de ganancia
 El margen de ganancia aplicado al precio de venta puede variar según el producto.
@@ -29,7 +29,7 @@ La mercadería recibida puede pagarse en el momento o quedar pendiente. El pago 
 Los empleados no podrán realizar las operaciones que sean exclusivas del empleador.
 
 ### 02 — Condición para otorgar fiado
-No se podrá registrar una venta fiada a un cliente cuya deuda esté excedida (el saldo de su cuenta corriente más el total de la nueva venta supera su límite de crédito) o sea vieja (tiene saldo pendiente y su último pago, o su primera venta fiada si nunca pagó, supera el plazo máximo de deuda). El límite de crédito de cada cliente y el plazo máximo de deuda los define el empleador.
+Solo se podrá registrar una venta fiada a un cliente habilitado para fiado. No existe un límite de crédito ni un plazo máximo de deuda fijos: el empleador decide a su criterio qué clientes están habilitados, y puede inhabilitar a un cliente, por ejemplo, cuando considera que su deuda es muy vieja o excesiva.
 
 ### 03 — Monto máximo de un pago de fiado
 El monto de un pago registrado sobre la cuenta corriente no podrá superar el saldo adeudado por el cliente.
@@ -48,6 +48,9 @@ Al cerrar el turno, el usuario debe ingresar el efectivo contado antes de que el
 
 ### 08 — Monto máximo de un pago a proveedor
 El monto de un pago asociado a un ingreso de mercadería no podrá superar el saldo pendiente de ese ingreso.
+
+### 09 — Costos de la mercadería
+Solo el empleador puede ver, registrar y modificar los costos unitarios de los productos. Cuando un empleado registra un ingreso de mercadería, carga los productos y cantidades recibidas, y los costos unitarios quedan pendientes hasta que el empleador los complete.
 
 ---
 
@@ -91,8 +94,5 @@ El efectivo esperado al cierre de un turno se calculará como el monto inicial d
 ### 06 — Diferencia de caja
 La diferencia de caja de un turno se calculará como el efectivo contado menos el efectivo esperado. Un valor positivo indica un sobrante y un valor negativo, un faltante.
 
-### 07 — Monto total de un ingreso de mercadería
-El monto total de un ingreso de mercadería se calculará como la sumatoria de la cantidad por el costo unitario de cada producto ingresado.
-
-### 08 — Saldo pendiente de un ingreso de mercadería
+### 07 — Saldo pendiente de un ingreso de mercadería
 El saldo pendiente de un ingreso se calculará como su monto total menos la sumatoria de los pagos al proveedor asociados a ese ingreso.
