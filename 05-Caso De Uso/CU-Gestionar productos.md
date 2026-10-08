@@ -6,7 +6,7 @@
 
 **Camino básico** (alta de producto): <br>
 1. El empleador indica que desea dar de alta un nuevo producto. <br>
-2. El sistema solicita código de barras (o código interno si el producto no tiene), nombre, descripción (opcional), categoría, proveedor, unidad de medida (unidad o kilogramo), precio de costo, margen de ganancia, stock inicial, stock mínimo y fecha de vencimiento (opcional). <br>
+2. El sistema solicita código de barras (o código interno si el producto no tiene), nombre, descripción (opcional), categoría, proveedor, unidad de medida (unidad o kilogramo), precio de costo, margen de ganancia, stock inicial y stock mínimo. <br>
 3. El empleador completa los datos. <br>
 4. El sistema calcula el precio de venta a partir del costo y el margen, redondeado al múltiplo de $10 superior, lo muestra y solicita confirmación. <br>
 5. El empleador confirma. <br>
