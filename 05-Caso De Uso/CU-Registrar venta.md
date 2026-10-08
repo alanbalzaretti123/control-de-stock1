@@ -41,6 +41,7 @@
   5.a.a.1 El usuario da de alta al cliente mediante el caso de uso Gestionar clientes. Continúa en el paso 5.a.1.<br>
 **5.b** El usuario indica que el pago se realiza combinando más de un medio de pago, ingresando el monto correspondiente a cada uno.<br>
   5.b.1 El sistema valida que la suma de los montos ingresados sea igual al total de la venta. Continúa en el paso 6.<br>
+  Nota: los montos registrados corresponden al importe de la venta abonado con cada medio, no al dinero entregado por el cliente. El vuelto lo calcula y entrega el empleado, y no se registra en el sistema.<br>
 
 **Escenario de éxito:** la venta queda registrada, el stock se actualiza y el importe se refleja en el balance de caja del turno (o queda pendiente de cobro si fue fiada).
 
