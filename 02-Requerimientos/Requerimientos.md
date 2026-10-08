@@ -44,7 +44,7 @@ RF-13 —
 El sistema diferenciara las funcionalidades disponibles para los empleados y el empleador según su rol.
 
 RF-14 —
-El sistema permitirá aplicar un aumento de precio masivo a todos los productos asociados a un proveedor determinado.
+El sistema permitirá al empleador aplicar un aumento (o una baja) porcentual sobre el precio de costo de los productos de un proveedor, eligiendo todos sus productos, solo los de una categoría o seleccionándolos uno por uno, y recalculando el precio de venta de cada uno según su margen de ganancia.
 
 RF-15 —
 El sistema permitirá registrar una venta fiada a un cliente registrado, cargando el total de la venta en su cuenta corriente.
@@ -96,6 +96,9 @@ El sistema permitirá a empleados y empleador consultar e imprimir la lista de p
 
 RF-31 —
 El sistema permitirá al empleador imprimir el listado de stock de los productos.
+
+RF-32 —
+El sistema calculará el precio de venta de cada producto a partir de su precio de costo y su margen de ganancia, redondeado al múltiplo de $10 superior. El empleador podrá ajustar manualmente el precio de venta, en cuyo caso el sistema recalculará el margen de ganancia.
 
 ---
 

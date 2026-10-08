@@ -97,11 +97,14 @@ Al registrar un pago a un proveedor se reduce el saldo pendiente del ingreso aso
 ### 07 — Anulación de venta
 Al anular una venta se repone el stock de los productos vendidos. Si la venta fue de contado, se genera en el turno abierto un movimiento de salida de caja por cada medio de pago con el que se abonó, por el mismo monto. Si fue fiada, su total deja de sumar al saldo de la cuenta corriente del cliente.
 
+### 08 — Recálculo del precio de venta
+Al modificarse el precio de costo o el margen de ganancia de un producto (manualmente o mediante una actualización de precios por proveedor), el sistema recalcula su precio de venta según el cálculo 09.
+
 ---
 
 ### 4. Cálculos<br>
 ### 01 — Ganancia bruta por producto
-La ganancia bruta obtenida por un producto se determinará a partir de la diferencia entre su precio de venta y su precio de costo.
+La ganancia bruta de un período se calculará como la sumatoria, sobre los productos vendidos en ventas no anuladas, de (precio unitario − costo unitario) × cantidad, utilizando el precio y el costo registrados en cada venta y no los vigentes.
 
 ### 02 — Total de ventas por turno
 El total vendido de un turno se calculará como la sumatoria de los importes totales (totalVenta) de todas las ventas no anuladas registradas durante dicho turno.
@@ -123,3 +126,9 @@ El saldo pendiente de un ingreso se calculará como su monto total menos la suma
 
 ### 08 — Producto a reponer
 Un producto requiere reposición cuando está activo y su stock actual es menor o igual a su stock mínimo.
+
+### 09 — Precio de venta
+El precio de venta de un producto se calculará como precio de costo × (1 + margen de ganancia / 100), redondeado hacia arriba al múltiplo de $10 más cercano.
+
+### 10 — Margen ajustado manualmente
+Si el empleador fija el precio de venta a mano, el margen de ganancia se recalculará como (precio de venta / precio de costo − 1) × 100. En este caso el precio no se redondea.

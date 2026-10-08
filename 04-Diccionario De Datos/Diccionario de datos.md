@@ -25,7 +25,7 @@ Categoria = @idCategoria + nombreCategoria + (descripcionCategoria)
 
 Proveedor = @cuit + razonSocial + (telefono) + (email) + (direccion) + estadoProveedor
 
-Producto = @codigoBarras + nombreProducto + (descripcionProducto) + idCategoria + cuit + unidadMedida + precioCosto + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
+Producto = @codigoBarras + nombreProducto + (descripcionProducto) + idCategoria + cuit + unidadMedida + precioCosto + margenGanancia + precioVenta + stockActual + stockMinimo + (fechaVencimiento) + estadoProducto
 
 Cliente = @idCliente + nombreCliente + apellidoCliente + (telefono) + saldoDeuda + estadoCliente
 
@@ -93,7 +93,8 @@ Mínimas unidades indivisibles de datos, con su nombre, descripción, longitud, 
 | descripcionProducto | Descripción del producto. | 200 | Alfanumérico | Texto libre |
 | unidadMedida | Indica si el producto se vende por unidad o por kilogramo (por ejemplo, fiambres). | — | Alfanumérico | Dominio {(U, unidad); (K, kilogramo)} |
 | precioCosto | Costo de adquisición vigente del producto, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
-| precioVenta | Precio de venta vigente del producto al público, por unidad o por kilogramo según su unidad de medida. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
+| margenGanancia | Porcentaje que se aplica sobre el precio de costo para obtener el precio de venta; varía según el producto. | 5,2 | Numérico (decimal) | Continuo: mayor a −100 |
+| precioVenta | Precio de venta vigente del producto al público, por unidad o por kilogramo según su unidad de medida. Lo calcula el sistema a partir del costo y el margen, o lo fija el empleador manualmente. | 12,2 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | stockActual | Cantidad disponible en inventario, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | stockMinimo | Umbral de stock a partir del cual (stock actual menor o igual) el producto pasa a la lista de productos a reponer, en unidades o kilogramos según la unidad de medida del producto. | 10,3 | Numérico (decimal) | Continuo: {vi: 0; vf: n} |
 | fechaVencimiento | Fecha de vencimiento del producto, cuando corresponda. | — | Fecha | Fecha válida, posterior a la fecha de ingreso del producto |
