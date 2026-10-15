@@ -1,0 +1,46 @@
+@startuml
+title CU-01 — Iniciar sesión
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaInicioSesion" as P
+control ":GestorSesion" as G
+entity ":Usuario" as E
+
+U -> P : ingresarCredenciales(nombreUsuario, contraseña)
+activate P
+P -> G : iniciarSesion(nombreUsuario, contraseña)
+activate G
+G -> G : buscarUsuario(nombreUsuario)
+
+alt el usuario existe
+  G -> E : iniciarSesion(contraseña)
+  activate E
+  E --> G : resultado
+  deactivate E
+
+  alt credenciales válidas y usuario activo
+    G -> E : esEmpleador()
+    activate E
+    E --> G : rol
+    deactivate E
+    G --> P : sesión iniciada (rol)
+    P --> U : mostrarMenú(funcionalidades del rol)
+  else contraseña incorrecta (2.a)
+    G --> P : credenciales incorrectas
+    P --> U : mostrarMensaje("Usuario o contraseña incorrectos")
+  else usuario inactivo (2.b)
+    G --> P : usuario inactivo
+    P --> U : mostrarMensaje("Usuario dado de baja: contacte al empleador")
+  end
+
+else el usuario no existe (2.a)
+  G --> P : credenciales incorrectas
+  P --> U : mostrarMensaje("Usuario o contraseña incorrectos")
+end
+
+deactivate G
+deactivate P
+@enduml
