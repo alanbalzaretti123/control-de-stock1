@@ -1,5 +1,5 @@
 @startuml
-title CU-01 — Iniciar sesión
+title DS-01 — Iniciar sesión (CU-01)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true

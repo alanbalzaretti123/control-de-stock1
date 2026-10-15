@@ -1,5 +1,5 @@
 @startuml
-title CU-04 — Registrar movimiento de caja
+title DS-04 — Registrar movimiento de caja (CU-04)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true

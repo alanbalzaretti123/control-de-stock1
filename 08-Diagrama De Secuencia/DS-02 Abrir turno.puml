@@ -1,5 +1,5 @@
 @startuml
-title CU-02 — Abrir turno
+title DS-02 — Abrir turno (CU-02)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true

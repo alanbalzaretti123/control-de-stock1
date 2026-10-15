@@ -1,0 +1,166 @@
+@startuml
+title DS-05 — Registrar venta (CU-05)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaVenta" as P
+control ":GestorVenta" as G
+entity ":Producto" as PR
+entity ":Cliente" as C
+entity ":Turno" as T
+
+U -> P : iniciarVenta()
+activate P
+P -> G : nuevaVenta(usuario)
+activate G
+G -> G : buscarTurnoAbierto()
+create entity ":Venta" as V
+G -> V : crear(turno, usuario)
+G --> P : venta iniciada
+deactivate G
+
+== Carga de productos (pasos 1 y 2) ==
+loop por cada producto a vender
+  alt el producto tiene código de barras
+    U -> P : ingresarCodigo(codigoBarras)
+  else el producto no tiene código (1.a)
+    U -> P : buscarProducto(nombre)
+    P -> G : buscarPorNombre(nombre)
+    activate G
+    G --> P : productos coincidentes
+    deactivate G
+    P --> U : mostrarCoincidencias()
+    U -> P : seleccionarProducto(codigo)
+  end
+  P -> G : agregarProducto(codigo)
+  activate G
+  G -> G : buscarProducto(codigo)
+
+  alt el producto no existe (2.a)
+    G --> P : producto no encontrado
+    P --> U : mostrarMensaje("Producto no encontrado")
+  else el producto existe
+    G -> PR : estaActivo()
+    activate PR
+    PR --> G : Boolean
+    deactivate PR
+    alt producto dado de baja (2.d)
+      G --> P : producto inactivo
+      P --> U : mostrarMensaje("El producto está dado de baja")
+    else producto activo
+      opt se vende por kilogramo (2.c)
+        G --> P : solicitar peso
+        P --> U : solicitarPeso()
+        U -> P : ingresarPeso(kg)
+        P -> G : informarCantidad(kg)
+      end
+      G -> V : agregarProducto(producto, cantidad)
+      activate V
+      create entity ":DetalleVenta" as D
+      V -> D : crear(producto, cantidad, precioVenta, precioCosto)
+      D -> D : calcularSubtotal()
+      V --> G : línea agregada
+      deactivate V
+      note right of G : Si el stock no alcanza, la línea\nse agrega igual (2.b)
+      G --> P : líneas y total parcial
+      P --> U : mostrarLíneas()
+    end
+  end
+  deactivate G
+
+  opt el usuario quita un producto o cambia su cantidad (1.b / 3.a)
+    U -> P : modificarCantidad(producto, cantidad)
+    P -> G : modificarCantidad(producto, cantidad)
+    activate G
+    G -> V : modificarCantidad(producto, cantidad)
+    G --> P : líneas actualizadas
+    deactivate G
+    P --> U : mostrarLíneas()
+  end
+end
+
+== Fin de la carga (pasos 3 y 4) ==
+alt el usuario cancela la venta (3.b)
+  U -> P : cancelarVenta()
+  P -> G : cancelarVenta()
+  activate G
+  G -> V : cancelar()
+  G --> P : venta descartada
+  deactivate G
+  P --> U : mostrarMensaje("Venta cancelada")
+else el usuario finaliza la carga
+  U -> P : finalizarCarga()
+  P -> G : finalizarCarga()
+  activate G
+  G -> V : calcularTotal()
+  V --> G : total
+  G --> P : total
+  deactivate G
+  P --> U : mostrarTotal(total)
+
+  == Pago (pasos 5 y 6) ==
+  alt pago con un solo medio (5)
+    U -> P : indicarMedioPago(medio)
+    P -> G : registrarPago(medio)
+    activate G
+    G -> V : registrarPago(medio, total)
+  else pago combinado (5.b)
+    U -> P : indicarPagoCombinado()
+    P --> U : solicitarMontos()
+    U -> P : ingresarMontos(montoEfectivo, montoTransferencia)
+    P -> G : registrarPagos(montos)
+    loop por cada medio de pago
+      G -> V : registrarPago(medio, monto)
+    end
+  else venta fiada (5.a)
+    U -> P : indicarVentaFiada(cliente)
+    P -> G : registrarVentaFiada(cliente)
+    G -> G : buscarCliente(cliente)
+    opt el cliente no está registrado (5.a.a)
+      ref over U, P, G : CU-08 Gestionar clientes (alta de cliente)
+    end
+    G -> C : estaHabilitado()
+    activate C
+    C --> G : Boolean
+    deactivate C
+  end
+
+  alt venta fiada y cliente inhabilitado (5.a.1)
+    G --> P : fiado no permitido
+    P --> U : mostrarMensaje("El cliente no está habilitado para fiado")
+  else la suma de los montos no coincide con el total (6.a)
+    G -> V : validarPagos()
+    V --> G : false
+    G --> P : diferencia en los montos
+    P --> U : mostrarMensaje("Los montos no coinciden con el total")
+  else pago válido o fiado permitido
+    opt venta fiada
+      G -> V : asignarCliente(cliente)
+    end
+    G -> V : confirmar()
+    activate V
+    loop por cada línea de la venta
+      V -> PR : descontarStock(cantidad)
+    end
+    V --> G : venta confirmada
+    deactivate V
+    alt venta fiada (5.a.1)
+      G -> C : cargarDeuda(total)
+    else venta de contado (6)
+      loop por cada medio de pago
+        create entity ":MovimientoCaja" as M
+        G -> M : registrar()
+        G -> T : registrarMovimiento(movimiento)
+      end
+    end
+    G --> P : comprobante
+    P --> U : mostrarComprobante()
+    note over U, G : Si el cliente entrega dinero a cuenta de un fiado,\nse registra a continuación con el CU-07 (5.a.2)
+  end
+  deactivate G
+end
+
+deactivate P
+@enduml

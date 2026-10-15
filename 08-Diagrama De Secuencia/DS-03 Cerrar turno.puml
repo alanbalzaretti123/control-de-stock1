@@ -1,5 +1,5 @@
 @startuml
-title CU-03 — Cerrar turno
+title DS-03 — Cerrar turno (CU-03)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
