@@ -1,0 +1,42 @@
+@startuml
+title CU-04 — Registrar movimiento de caja
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaCaja" as P
+control ":GestorCaja" as G
+entity ":Turno" as T
+
+U -> P : solicitarMovimientoCaja()
+activate P
+P --> U : solicitarDatos(tipoMovimiento, monto, motivo)
+
+U -> P : ingresarDatos(tipoMovimiento, monto, motivo)
+P -> G : registrarMovimiento(tipoMovimiento, monto, motivo, usuario)
+activate G
+G -> G : validarMonto(monto)
+
+alt monto inválido (3.a)
+  G --> P : monto inválido
+  P --> U : mostrarMensaje("El monto ingresado es inválido")
+else monto válido
+  G -> G : buscarTurnoAbierto()
+  create entity ":MovimientoCaja" as M
+  G -> M : registrar()
+  note right of M : tipo: retiro o aporte\nmedioPago: efectivo
+  activate M
+  M --> G : movimiento registrado
+  deactivate M
+  G -> T : registrarMovimiento(movimiento)
+  activate T
+  T --> G : ok
+  deactivate T
+  G --> P : movimiento registrado
+  P --> U : mostrarConfirmación(tipo, monto, motivo)
+end
+
+deactivate G
+deactivate P
+@enduml
