@@ -1,0 +1,74 @@
+@startuml
+title CU-02 — Abrir turno
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaTurno" as P
+control ":GestorTurno" as G
+entity ":Usuario" as US
+entity "turnoCerrado:Turno" as TC
+
+U -> P : solicitarAperturaTurno()
+activate P
+P -> G : verificarTurnoAbierto()
+activate G
+G -> G : buscarTurnoAbierto()
+
+alt ya existe un turno abierto (1.a)
+  G --> P : turno abierto existente
+  P --> U : mostrarMensaje("Debe cerrar el turno abierto antes de abrir uno nuevo")
+else no hay turno abierto
+  G --> P : se puede abrir
+  deactivate G
+  P --> U : solicitarDatos(tipoTurno, montoInicial)
+
+  U -> P : ingresarDatos(tipoTurno, montoInicial)
+  P -> G : abrirTurno(tipoTurno, montoInicial, usuario)
+  activate G
+  G -> G : validarMonto(montoInicial)
+
+  alt monto inválido (3.a)
+    G --> P : monto inválido
+    P --> U : mostrarMensaje("El monto ingresado es inválido")
+  else monto válido
+    G -> G : buscarTurno(fechaActual, tipoTurno)
+
+    alt el turno no existe en la fecha
+      create entity "nuevoTurno:Turno" as T
+      G -> T : abrir(tipoTurno, montoInicial, usuario)
+      activate T
+      T --> G : turno abierto
+      deactivate T
+      G --> P : turno abierto
+      P --> U : mostrarConfirmación(fecha, hora de apertura, responsable)
+
+    else el turno ya fue cerrado en la fecha
+      G -> US : esEmpleador()
+      activate US
+      US --> G : rol
+      deactivate US
+
+      alt el usuario es Empleador (3.b)
+        G --> P : turno cerrado, se puede reabrir
+        P --> U : preguntarReapertura()
+        U -> P : confirmarReapertura()
+        P -> G : reabrirTurno()
+        G -> TC : reabrir()
+        activate TC
+        TC --> G : turno reabierto
+        deactivate TC
+        G --> P : turno reabierto
+        P --> U : mostrarConfirmación("Turno reabierto")
+      else el usuario es Empleado (3.c)
+        G --> P : turno cerrado
+        P --> U : mostrarMensaje("Ese turno ya fue cerrado: solo el empleador puede reabrirlo")
+      end
+    end
+  end
+  deactivate G
+end
+
+deactivate P
+@enduml
