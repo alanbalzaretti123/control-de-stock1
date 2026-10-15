@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-09 Registrar ingreso de mercaderia.md
 title DS-09 — Registrar ingreso de mercadería (CU-09)
 hide footbox
 skinparam sequenceMessageAlign center

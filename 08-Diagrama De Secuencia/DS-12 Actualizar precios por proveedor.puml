@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-12 Actualizar precios por proveedor.md
 title DS-12 — Actualizar precios por proveedor (CU-12)
 hide footbox
 skinparam sequenceMessageAlign center

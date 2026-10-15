@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-04 Registrar movimiento de caja.md
 title DS-04 — Registrar movimiento de caja (CU-04)
 hide footbox
 skinparam sequenceMessageAlign center

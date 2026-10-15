@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-13 Gestionar productos.md
 title DS-13 — Gestionar productos (CU-13)
 hide footbox
 skinparam sequenceMessageAlign center

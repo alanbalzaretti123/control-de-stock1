@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-03 Cerrar turno.md
 title DS-03 — Cerrar turno (CU-03)
 hide footbox
 skinparam sequenceMessageAlign center

@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-10 Registrar pago a proveedor.md
 title DS-10 — Registrar pago a proveedor (CU-10)
 hide footbox
 skinparam sequenceMessageAlign center

@@ -1,4 +1,5 @@
 @startuml
+' Caso de uso de referencia: 05-Caso De Uso/CU-18 Consultar reportes de ventas.md
 title DS-18 — Consultar reportes de ventas (CU-18)
 hide footbox
 skinparam sequenceMessageAlign center
