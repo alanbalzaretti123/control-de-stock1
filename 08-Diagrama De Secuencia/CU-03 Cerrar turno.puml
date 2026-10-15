@@ -1,0 +1,52 @@
+@startuml
+title CU-03 — Cerrar turno
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaTurno" as P
+control ":GestorTurno" as G
+entity ":Turno" as T
+entity ":MovimientoCaja" as M
+
+U -> P : solicitarCierreTurno()
+activate P
+P -> G : iniciarCierre()
+activate G
+G -> G : buscarTurnoAbierto()
+G --> P : turno abierto
+deactivate G
+P --> U : solicitarEfectivoContado()
+note right of P : No se muestra el efectivo\nesperado (arqueo ciego)
+
+U -> P : ingresarEfectivoContado(montoContado)
+P -> G : cerrarTurno(montoContado)
+activate G
+G -> G : validarMonto(montoContado)
+
+alt monto inválido (3.a)
+  G --> P : monto inválido
+  P --> U : mostrarMensaje("El monto ingresado es inválido")
+else monto válido
+  G -> T : cerrar(montoContado)
+  activate T
+  T -> T : calcularEfectivoEsperado()
+  loop por cada movimiento del turno
+    T -> M : esEfectivo()
+    activate M
+    M --> T : Boolean
+    T -> M : esEntrada()
+    M --> T : Boolean
+    deactivate M
+  end
+  T -> T : calcularDiferencia()
+  T --> G : resumen del cierre
+  deactivate T
+  G --> P : resumen del cierre
+  P --> U : mostrarResumen(montoInicial, entradas y salidas por medio de pago,\nefectivo esperado, efectivo contado, diferencia)
+end
+
+deactivate G
+deactivate P
+@enduml
