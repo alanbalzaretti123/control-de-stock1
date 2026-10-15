@@ -12,14 +12,15 @@
 3. El usuario indica que finalizó la carga de productos.<br>
 4. El sistema calcula el total de la venta.<br>
 5. El usuario indica el medio de pago.<br>
-6. El sistema registra el pago, descuenta el stock de cada producto vendido, genera el comprobante y registra un movimiento de caja por cada medio de pago en el turno abierto.
+6. El sistema valida el pago, lo registra, descuenta el stock de cada producto vendido, genera el comprobante y registra un movimiento de caja por cada medio de pago en el turno abierto.
 
 **Caminos alternativos:**<br>
 **1.a** El producto no tiene código de barras.<br>
   1.a.1 El usuario busca el producto por nombre o ingresa su código interno.<br>
-  1.a.2 El sistema muestra los productos que coinciden y el usuario selecciona el que desea vender. Continúa en el paso 2.<br>
+  1.a.2 El sistema muestra los productos que coinciden.<br>
+  1.a.3 El usuario selecciona el producto que desea vender. Continúa en el paso 2.<br>
 **1.b** El usuario ingresa la cantidad a vender del producto (por ejemplo, 12 unidades) en lugar de escanearlo varias veces.<br>
-  1.b.1 El sistema registra esa cantidad en la línea del producto. Continúa en el paso 2.<br>
+  1.b.1 El sistema registra esa cantidad en la línea del producto. Vuelve al paso 1.<br>
 **2.a** El código de barras ingresado no corresponde a ningún producto registrado.<br>
   2.a.1 El sistema informa que el producto no fue encontrado y no agrega ninguna línea por ese código. Vuelve al paso 1.<br>
 **2.b** El producto no tiene stock suficiente para la cantidad solicitada.<br>
@@ -39,9 +40,12 @@
   5.a.2 Si el cliente entrega dinero a cuenta en ese momento, la venta se registra completa como fiada y lo entregado se registra a continuación mediante el caso de uso Registrar pago de deuda (CU-07).<br>
 **5.a.a** El cliente no está registrado en el sistema.<br>
   5.a.a.1 El usuario da de alta al cliente mediante el caso de uso Gestionar clientes (CU-08). Continúa en el paso 5.a.1.<br>
-**5.b** El usuario indica que el pago se realiza combinando más de un medio de pago, ingresando el monto correspondiente a cada uno.<br>
-  5.b.1 El sistema valida que la suma de los montos ingresados sea igual al total de la venta. Continúa en el paso 6.<br>
+**5.b** El usuario indica que el pago se realiza combinando más de un medio de pago.<br>
+  5.b.1 El sistema solicita el monto correspondiente a cada medio de pago.<br>
+  5.b.2 El usuario ingresa los montos. Continúa en el paso 6.<br>
   Nota: los montos registrados corresponden al importe de la venta abonado con cada medio, no al dinero entregado por el cliente. El vuelto lo calcula y entrega el empleado, y no se registra en el sistema.<br>
+**6.a** La suma de los montos ingresados en un pago combinado no coincide con el total de la venta.<br>
+  6.a.1 El sistema informa la diferencia y no registra la venta. Vuelve al paso 5.b.2.<br>
 
 **Escenario de éxito:** la venta queda registrada, el stock se actualiza y el importe se refleja en el balance de caja del turno (o queda pendiente de cobro si fue fiada).
 

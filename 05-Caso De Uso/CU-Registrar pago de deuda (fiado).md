@@ -14,8 +14,9 @@
 4. El sistema valida que el monto no supere el saldo adeudado y, si es válido, registra el pago, reduce el saldo del cliente y registra un movimiento de caja por cada medio de pago en el turno abierto.<br>
 
 **Caminos alternativos:**<br>
-**3.a** El usuario indica que el pago se realiza combinando más de un medio de pago, ingresando el monto correspondiente a cada uno.<br>
-  3.a.1 El sistema valida que la suma de los montos ingresados sea igual al monto total a abonar. Continúa en el paso 4.<br>
+**3.a** El usuario indica que el pago se realiza combinando más de un medio de pago.<br>
+  3.a.1 El sistema solicita el monto correspondiente a cada medio de pago.<br>
+  3.a.2 El usuario ingresa los montos. Continúa en el paso 4, tomando como monto a abonar la suma de los montos ingresados.<br>
 **4.a** El monto ingresado supera el saldo adeudado por el cliente.<br>
   4.a.1 El sistema informa que el monto supera la deuda del cliente. Vuelve al paso 3.<br>
 

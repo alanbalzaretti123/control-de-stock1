@@ -16,8 +16,9 @@
 1.a.2 El empleador ingresa los nuevos valores y confirma. <br>
 1.a.3 El sistema actualiza el usuario. Fin del caso de uso. <br>
 **1.b** El empleador indica que desea restablecer la contraseña de un usuario (por ejemplo, porque la olvidó). <br>
-1.b.1 El empleador ingresa una nueva contraseña y confirma. <br>
-1.b.2 El sistema actualiza la contraseña del usuario. Fin del caso de uso. <br>
+1.b.1 El sistema solicita la nueva contraseña. <br>
+1.b.2 El empleador ingresa la nueva contraseña y confirma. <br>
+1.b.3 El sistema actualiza la contraseña del usuario. Fin del caso de uso. <br>
 **1.c** El empleador indica que desea dar de baja un usuario (por ejemplo, porque dejó de trabajar en el negocio). <br>
 1.c.1 El sistema solicita confirmación. <br>
 1.c.2 El empleador confirma. <br>

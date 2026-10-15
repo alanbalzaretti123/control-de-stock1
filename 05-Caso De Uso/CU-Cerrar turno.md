@@ -10,9 +10,7 @@ Debe existir un turno abierto. <br>
 1. El usuario indica que desea cerrar el turno abierto. <br>
 2. El sistema solicita el monto de efectivo contado en la caja, sin mostrar el efectivo esperado. <br>
 3. El usuario cuenta el efectivo, ingresa el monto y confirma. <br>
-4. El sistema calcula el efectivo esperado (monto inicial + entradas en efectivo − salidas en efectivo) y la diferencia con el efectivo contado. <br>
-5. El sistema muestra el resumen del turno: monto inicial, entradas y salidas por medio de pago, efectivo esperado, efectivo contado y diferencia (faltante o sobrante). <br>
-6. El sistema registra el cierre con la hora de cierre y marca el turno como cerrado. <br>
+4. El sistema calcula el efectivo esperado (monto inicial + entradas en efectivo − salidas en efectivo) y la diferencia con el efectivo contado, registra el cierre con la hora de cierre, marca el turno como cerrado y muestra el resumen del turno: monto inicial, entradas y salidas por medio de pago, efectivo esperado, efectivo contado y diferencia (faltante o sobrante). <br>
 
 **Caminos alternativos:** <br>
 **3.a** El monto ingresado es inválido (negativo o no numérico). <br>
