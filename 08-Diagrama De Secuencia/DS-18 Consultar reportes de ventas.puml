@@ -1,0 +1,59 @@
+@startuml
+title DS-18 — Consultar reportes de ventas (CU-18)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleador" as U
+boundary ":PantallaReportes" as P
+control ":GestorReportes" as G
+entity ":Venta" as V
+entity ":DetalleVenta" as D
+entity ":Turno" as T
+
+U -> P : seleccionarReporte(tipo, filtro)
+activate P
+P -> G : generarReporte(tipo, filtro)
+activate G
+
+alt productos más vendidos (fecha desde / hasta)
+  G -> G : buscarVentas(fechaDesde, fechaHasta)
+  loop por cada venta del período
+    G -> V : estaAnulada()
+    V --> G : Boolean
+    loop por cada línea de una venta no anulada
+      G -> D : getCantidad()
+      D --> G : producto y cantidad
+    end
+  end
+  G -> G : ordenarPorCantidadVendida()
+else cantidad de ventas (fecha desde / hasta)
+  G -> G : buscarVentas(fechaDesde, fechaHasta)
+  loop por cada venta del período
+    G -> V : estaAnulada()
+    V --> G : Boolean
+  end
+  G -> G : contarVentasNoAnuladas()
+else total vendido por turno
+  G -> G : buscarTurno(fecha, tipoTurno)
+  G -> T : calcularTotalVendido()
+  T --> G : total en efectivo, por transferencia y general
+end
+
+alt no hay datos para el filtro (2.a)
+  G --> P : sin datos
+  P --> U : mostrarMensaje("No hay datos para el período seleccionado")
+else hay datos
+  G --> P : resultado del reporte
+  P --> U : mostrarReporte()
+  opt el empleador pide imprimir (2.b)
+    U -> P : imprimirReporte()
+    P -> G : generarDocumento()
+    G --> P : documento imprimible
+    P --> U : mostrarDocumento()
+  end
+end
+
+deactivate G
+deactivate P
+@enduml

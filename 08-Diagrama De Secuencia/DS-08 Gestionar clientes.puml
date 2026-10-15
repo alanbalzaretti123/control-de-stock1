@@ -1,0 +1,84 @@
+@startuml
+title DS-08 — Gestionar clientes (CU-08)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaClientes" as P
+control ":GestorClientes" as G
+entity ":Cliente" as C
+
+alt alta de cliente (camino básico)
+  U -> P : solicitarAltaCliente()
+  activate P
+  P --> U : solicitarDatos(nombre, apellido, telefono)
+  U -> P : ingresarDatos(nombre, apellido, telefono)
+  P -> G : darDeAltaCliente(nombre, apellido, telefono)
+  activate G
+  G -> G : buscarCliente(nombre, apellido)
+  opt ya existe un cliente con el mismo nombre y apellido (3.a)
+    G --> P : posible duplicado
+    P --> U : mostrarAdvertencia(cliente existente)
+    U -> P : confirmarQueEsOtraPersona()
+    P -> G : confirmarAlta()
+  end
+  create entity "nuevo:Cliente" as N
+  G -> N : darDeAlta()
+  note right of N : habilitado para fiado\ny saldo en cero
+  G --> P : cliente registrado
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else modificar datos (1.a) — solo Empleador
+  U -> P : seleccionarCliente(cliente)
+  activate P
+  P --> U : mostrarDatos(cliente)
+  U -> P : ingresarNuevosDatos(nombre, apellido, telefono)
+  P -> G : modificarCliente(cliente, datos)
+  activate G
+  G -> C : modificar(nombre, apellido, telefono)
+  G --> P : cliente actualizado
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else habilitar / inhabilitar (1.b) — solo Empleador
+  U -> P : seleccionarCambioEstado(cliente)
+  activate P
+  P -> G : obtenerEstado(cliente)
+  activate G
+  G -> C : calcularSaldo()
+  C --> G : saldo
+  G --> P : estado y saldo
+  deactivate G
+  P --> U : solicitarConfirmación(estado, saldo)
+  U -> P : confirmar()
+  P -> G : cambiarEstado(cliente)
+  activate G
+  alt el cliente está habilitado
+    G -> C : inhabilitar()
+  else el cliente está inhabilitado
+    G -> C : habilitar()
+  end
+  G --> P : estado actualizado
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else consultar cuenta corriente (1.c) — solo Empleador
+  U -> P : consultarCuentaCorriente(cliente)
+  activate P
+  P -> G : consultarCuentaCorriente(cliente)
+  activate G
+  G -> C : consultarCuentaCorriente()
+  C --> G : ventas fiadas y pagos
+  G -> C : calcularSaldo()
+  C --> G : saldo
+  G --> P : cuenta corriente
+  deactivate G
+  P --> U : mostrarCuentaCorriente(saldo, movimientos ordenados por fecha)
+  deactivate P
+end
+@enduml

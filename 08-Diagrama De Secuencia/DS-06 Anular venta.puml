@@ -1,0 +1,74 @@
+@startuml
+title DS-06 — Anular venta (CU-06)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleador" as U
+boundary ":PantallaAnulacion" as P
+control ":GestorVenta" as G
+entity ":Venta" as V
+entity ":Cliente" as C
+entity ":Producto" as PR
+entity ":Turno" as T
+
+U -> P : ingresarComprobante(numeroComprobante)
+activate P
+P -> G : buscarVenta(numeroComprobante)
+activate G
+G -> G : buscarVenta(numeroComprobante)
+
+alt la venta no existe (1.a)
+  G --> P : venta inexistente
+  P --> U : mostrarMensaje("La venta no existe")
+else la venta existe
+  G -> V : estaAnulada()
+  activate V
+  V --> G : Boolean
+  deactivate V
+
+  alt la venta ya está anulada (2.a)
+    G --> P : venta ya anulada
+    P --> U : mostrarMensaje("La venta ya fue anulada")
+  else la venta es fiada y el cliente ya pagó parte (2.b)
+    G -> C : calcularSaldo()
+    activate C
+    C --> G : saldo < total de la venta
+    deactivate C
+    G --> P : no se puede anular
+    P --> U : mostrarMensaje("La venta no puede anularse: el cliente ya pagó parte")
+  else la venta se puede anular
+    G --> P : detalle de la venta
+    deactivate G
+    P --> U : mostrarDetalle(fecha, productos, total, condición, medios de pago)
+
+    U -> P : confirmarAnulacion(motivo)
+    P -> G : anularVenta(motivo, usuario)
+    activate G
+    G -> V : anular(usuario, motivo)
+    activate V
+    loop por cada línea de la venta
+      V -> PR : reponerStock(cantidad)
+    end
+    V --> G : venta anulada
+    deactivate V
+
+    alt venta de contado (4)
+      loop por cada medio de pago de la venta
+        create entity ":MovimientoCaja" as M
+        G -> M : registrar()
+        note right of M : tipo: anulación (salida)\nmismo medio y monto
+        G -> T : registrarMovimiento(movimiento)
+      end
+    else venta fiada (4.a)
+      G -> C : descontarDeuda(total)
+    end
+
+    G --> P : venta anulada
+    P --> U : mostrarConfirmación("Venta anulada")
+  end
+end
+
+deactivate G
+deactivate P
+@enduml

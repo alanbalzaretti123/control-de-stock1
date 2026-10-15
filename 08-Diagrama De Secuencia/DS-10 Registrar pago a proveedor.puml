@@ -1,0 +1,83 @@
+@startuml
+title DS-10 — Registrar pago a proveedor (CU-10)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaPagoProveedor" as P
+control ":GestorPagoProveedor" as G
+entity ":Proveedor" as PV
+entity ":IngresoMercaderia" as I
+entity ":Turno" as T
+
+U -> P : seleccionarProveedor(proveedor)
+activate P
+P -> G : obtenerIngresosPendientes(proveedor)
+activate G
+G -> PV : obtenerIngresosPendientes()
+activate PV
+PV --> G : ingresos con saldo pendiente
+deactivate PV
+G --> P : ingresos pendientes
+deactivate G
+
+alt hay ingresos pendientes (2 y 3)
+  P --> U : mostrarIngresosPendientes()
+  U -> P : seleccionarIngreso(ingreso)
+else no hay ingresos pendientes o el pago no corresponde a un ingreso (2.a)
+  P --> U : solicitarConcepto()
+  U -> P : ingresarConcepto(concepto)
+end
+
+P --> U : solicitarMedioYMonto()
+alt un solo medio de pago (5)
+  U -> P : ingresarPago(medio, monto)
+else pago combinado (5.a)
+  U -> P : indicarPagoCombinado()
+  P --> U : solicitarMontos()
+  U -> P : ingresarMontos(montoEfectivo, montoTransferencia)
+end
+
+P -> G : validarPago(ingreso, montos)
+activate G
+G -> I : calcularSaldoPendiente()
+activate I
+I --> G : saldoPendiente
+deactivate I
+create entity ":PagoProveedor" as PP
+G -> PP : crear(proveedor, ingreso, medio, monto, usuario)
+G -> PP : validarMonto(saldoPendiente)
+activate PP
+PP --> G : Boolean
+deactivate PP
+G -> T : calcularEfectivoEsperado()
+activate T
+T --> G : efectivo disponible
+deactivate T
+
+alt el monto supera el saldo pendiente (6.a)
+  G --> P : monto excedido
+  P --> U : mostrarMensaje("El monto supera lo adeudado por ese ingreso")
+else el efectivo de la caja no alcanza (6.b)
+  G --> P : efectivo insuficiente
+  P --> U : mostrarMensaje("El efectivo no alcanza: avisar al empleador o dejar pendiente")
+else pago válido (6)
+  G --> P : pago válido
+  P --> U : solicitarConfirmación()
+  U -> P : confirmarPago()
+  P -> G : confirmarPago()
+  loop por cada medio de pago (8)
+    G -> PP : registrar()
+    create entity ":MovimientoCaja" as M
+    G -> M : registrar()
+    note right of M : tipo: pago a proveedor (salida)
+    G -> T : registrarMovimiento(movimiento)
+  end
+  G --> P : pago registrado
+  P --> U : mostrarConfirmación(saldo pendiente restante)
+end
+
+deactivate G
+deactivate P
+@enduml

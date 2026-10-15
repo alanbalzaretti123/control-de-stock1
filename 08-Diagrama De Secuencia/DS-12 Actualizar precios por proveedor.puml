@@ -1,0 +1,74 @@
+@startuml
+title DS-12 — Actualizar precios por proveedor (CU-12)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleador" as U
+boundary ":PantallaPrecios" as P
+control ":GestorPrecios" as G
+entity ":Producto" as PR
+
+U -> P : seleccionarProveedor(proveedor)
+activate P
+P -> G : obtenerProductos(proveedor)
+activate G
+G -> G : buscarProductosActivos(proveedor)
+alt el proveedor no tiene productos activos (1.a)
+  G --> P : sin productos
+  P --> U : mostrarMensaje("El proveedor no tiene productos asociados")
+else tiene productos
+  G --> P : productos del proveedor
+  deactivate G
+  P --> U : mostrarProductos(categoría, costo, margen, precio de venta)
+
+  alt se aplica a todos los productos (3)
+    U -> P : seleccionarTodos()
+  else solo una categoría (3.a)
+    U -> P : filtrarPorCategoria()
+    P --> U : mostrarCategorias()
+    U -> P : seleccionarCategoria(categoria)
+  else selección uno por uno (3.b)
+    U -> P : seleccionarManualmente()
+    P --> U : mostrarListaParaSeleccionar()
+    U -> P : marcarProductos(productos)
+  end
+
+  P --> U : solicitarPorcentaje()
+  U -> P : ingresarPorcentaje(porcentaje)
+  P -> G : calcularVistaPrevia(productos, porcentaje)
+  activate G
+  G -> G : validarPorcentaje(porcentaje)
+  alt porcentaje inválido (5.a)
+    G --> P : porcentaje inválido
+    P --> U : mostrarMensaje("El porcentaje es inválido")
+  else porcentaje válido
+    loop por cada producto elegido
+      G -> PR : calcularPrecioVenta()
+      note right of PR : con el costo simulado\nsegún el porcentaje
+      PR --> G : nuevo precio
+    end
+    G --> P : vista previa
+    P --> U : mostrarVistaPrevia(valores anteriores y nuevos)
+
+    alt el empleador confirma (7 y 8)
+      U -> P : confirmar()
+      P -> G : aplicarActualizacion()
+      loop por cada producto elegido
+        G -> PR : actualizarCosto(porcentaje)
+        activate PR
+        PR -> PR : calcularPrecioVenta()
+        deactivate PR
+      end
+      G --> P : precios actualizados
+      P --> U : mostrarConfirmación()
+    else el empleador no confirma (7.a)
+      U -> P : cancelar()
+      P --> U : volver a la selección de productos (paso 3)
+    end
+  end
+  deactivate G
+end
+
+deactivate P
+@enduml

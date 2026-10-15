@@ -1,0 +1,98 @@
+@startuml
+title DS-13 — Gestionar productos (CU-13)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleador" as U
+boundary ":PantallaProductos" as P
+control ":GestorProductos" as G
+entity ":Producto" as PR
+
+alt alta de producto (camino básico)
+  U -> P : solicitarAltaProducto()
+  activate P
+  P --> U : solicitarDatos(código, nombre, categoría, proveedor, unidad, costo, margen, stock)
+  U -> P : ingresarDatos(datos)
+  P -> G : prepararAlta(datos)
+  activate G
+  create entity "nuevo:Producto" as N
+  G -> N : crear(datos)
+  G -> N : calcularPrecioVenta()
+  N --> G : precioVenta (redondeado a $10)
+  G --> P : precio de venta calculado
+  deactivate G
+  P --> U : mostrarPrecioVenta() y solicitarConfirmación()
+
+  opt el empleador ajusta el precio a mano (5.a)
+    U -> P : ajustarPrecio(precio)
+    P -> G : ajustarPrecio(precio)
+    activate G
+    G -> N : ajustarPrecioVenta(precio)
+    note right of N : recalcula el margen
+    opt el precio queda por debajo del costo (5.b)
+      G --> P : advertencia de venta a pérdida
+      P --> U : mostrarAdvertencia()
+    end
+    G --> P : nuevo margen
+    deactivate G
+    P --> U : mostrarMargen() y solicitarConfirmación()
+  end
+
+  U -> P : confirmar()
+  P -> G : darDeAlta()
+  activate G
+  G -> G : buscarProducto(codigo)
+  alt el código ya está registrado (6.a)
+    G --> P : código existente
+    P --> U : mostrarMensaje("El código ya existe")
+  else código nuevo (6)
+    G -> N : darDeAlta()
+    G --> P : producto registrado
+    P --> U : mostrarConfirmación()
+  end
+  deactivate G
+  deactivate P
+
+else modificar producto (1.a)
+  U -> P : seleccionarProducto(producto)
+  activate P
+  P --> U : mostrarDatos(producto)
+  U -> P : ingresarNuevosValores(valores)
+  P -> G : prepararModificacion(producto, valores)
+  activate G
+  opt se modificó el costo o el margen
+    G -> PR : modificarMargen(margen)
+    G -> PR : calcularPrecioVenta()
+    PR --> G : nuevo precio de venta
+  end
+  opt se corrigió el stock
+    G -> PR : corregirStock(cantidad)
+  end
+  G --> P : datos resultantes
+  deactivate G
+  P --> U : mostrarDatos() y solicitarConfirmación()
+  U -> P : confirmar()
+  P -> G : guardarModificacion()
+  activate G
+  G -> PR : modificar()
+  G --> P : producto actualizado
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else dar de baja (1.b)
+  U -> P : solicitarBaja(producto)
+  activate P
+  P --> U : solicitarConfirmación()
+  U -> P : confirmar()
+  P -> G : darDeBaja(producto)
+  activate G
+  G -> PR : darDeBaja()
+  note right of PR : queda inactivo, sin borrarse\ndel historial de ventas
+  G --> P : producto inactivo
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+end
+@enduml

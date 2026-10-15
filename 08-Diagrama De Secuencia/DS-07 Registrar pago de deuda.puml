@@ -1,0 +1,63 @@
+@startuml
+title DS-07 — Registrar pago de deuda (CU-07)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaPagoFiado" as P
+control ":GestorFiado" as G
+entity ":Cliente" as C
+entity ":Turno" as T
+
+U -> P : buscarCliente(nombre, apellido)
+activate P
+P -> G : buscarCliente(nombre, apellido)
+activate G
+G -> G : buscarCliente(nombre, apellido)
+G -> C : calcularSaldo()
+activate C
+C --> G : saldo
+deactivate C
+G --> P : saldo adeudado
+deactivate G
+P --> U : mostrarSaldo(saldo)
+
+alt pago con un solo medio (3)
+  U -> P : ingresarPago(medio, monto)
+else pago combinado (3.a)
+  U -> P : indicarPagoCombinado()
+  P --> U : solicitarMontos()
+  U -> P : ingresarMontos(montoEfectivo, montoTransferencia)
+end
+
+P -> G : registrarPago(cliente, montos)
+activate G
+create entity ":PagoFiado" as PF
+G -> PF : crear(cliente, turno, usuario)
+loop por cada medio de pago
+  G -> PF : agregarMedioPago(medio, monto)
+end
+G -> PF : validarMonto(saldo)
+activate PF
+PF --> G : Boolean
+deactivate PF
+
+alt el monto supera el saldo adeudado (4.a)
+  G --> P : monto excedido
+  P --> U : mostrarMensaje("El monto supera la deuda del cliente")
+else monto válido (4)
+  G -> PF : registrar()
+  G -> C : descontarDeuda(total)
+  loop por cada medio de pago
+    create entity ":MovimientoCaja" as M
+    G -> M : registrar()
+    G -> T : registrarMovimiento(movimiento)
+  end
+  G --> P : pago registrado
+  P --> U : mostrarComprobante(recibo, saldo restante)
+end
+
+deactivate G
+deactivate P
+@enduml

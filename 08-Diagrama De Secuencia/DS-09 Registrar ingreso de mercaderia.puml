@@ -1,0 +1,65 @@
+@startuml
+title DS-09 — Registrar ingreso de mercadería (CU-09)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleado / Empleador" as U
+boundary ":PantallaIngreso" as P
+control ":GestorIngreso" as G
+entity ":Producto" as PR
+
+U -> P : iniciarIngreso(proveedor, numeroRemito)
+activate P
+P -> G : nuevoIngreso(proveedor, numeroRemito, usuario)
+activate G
+create entity ":IngresoMercaderia" as I
+G -> I : crear(proveedor, numeroRemito, usuario)
+G --> P : ingreso iniciado
+deactivate G
+
+loop por cada producto recibido
+  U -> P : agregarProducto(codigo, cantidad)
+  P -> G : agregarProducto(codigo, cantidad)
+  activate G
+  G -> G : buscarProducto(codigo)
+  G -> I : agregarProducto(producto, cantidad)
+  activate I
+  create entity ":DetalleIngreso" as DI
+  I -> DI : crear(producto, cantidad)
+  deactivate I
+  G --> P : línea agregada
+  deactivate G
+end
+
+U -> P : ingresarImporteTotal(montoTotal)
+P --> U : mostrarResumen() y solicitarConfirmación()
+U -> P : confirmarIngreso()
+P -> G : confirmarIngreso(montoTotal)
+activate G
+G -> I : registrar()
+activate I
+loop por cada línea del ingreso
+  I -> PR : reponerStock(cantidad)
+end
+deactivate I
+G --> P : ingreso registrado
+deactivate G
+P --> U : preguntarPago()
+
+alt el pago se realiza en el momento (5 y 6)
+  U -> P : indicarPagoEnElMomento()
+  ref over U, P, G : DS-10 Registrar pago a proveedor (para el ingreso registrado)
+else el pago queda pendiente (5.a)
+  U -> P : indicarPagoPendiente()
+  P -> G : dejarPendiente()
+  activate G
+  G -> I : calcularSaldoPendiente()
+  I --> G : saldo = importe total
+  G --> P : ingreso pendiente de pago
+  deactivate G
+  P --> U : mostrarConfirmación("Ingreso registrado con pago pendiente")
+end
+
+deactivate P
+@enduml

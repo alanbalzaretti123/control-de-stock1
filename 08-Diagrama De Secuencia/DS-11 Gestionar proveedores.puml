@@ -1,0 +1,77 @@
+@startuml
+title DS-11 — Gestionar proveedores (CU-11)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleador" as U
+boundary ":PantallaProveedores" as P
+control ":GestorProveedores" as G
+entity ":Proveedor" as PV
+
+alt alta de proveedor (camino básico)
+  U -> P : solicitarAltaProveedor()
+  activate P
+  P --> U : solicitarDatos(cuit, razonSocial, telefono, email, direccion)
+  U -> P : ingresarDatos(cuit, razonSocial, telefono, email, direccion)
+  P -> G : darDeAltaProveedor(datos)
+  activate G
+  G -> G : buscarProveedor(cuit)
+  alt el CUIT ya está registrado (4.a)
+    G --> P : CUIT existente
+    P --> U : mostrarMensaje("El CUIT ya está registrado")
+  else CUIT nuevo
+    create entity "nuevo:Proveedor" as N
+    G -> N : darDeAlta()
+    G --> P : proveedor registrado
+    P --> U : mostrarConfirmación()
+  end
+  deactivate G
+  deactivate P
+
+else modificar proveedor (1.a)
+  U -> P : seleccionarProveedor(proveedor)
+  activate P
+  P --> U : mostrarDatos(proveedor)
+  U -> P : ingresarNuevosDatos(datos)
+  P -> G : modificarProveedor(proveedor, datos)
+  activate G
+  G -> PV : modificar()
+  G --> P : proveedor actualizado
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else dar de baja (1.b)
+  U -> P : solicitarBaja(proveedor)
+  activate P
+  P -> G : verificarBaja(proveedor)
+  activate G
+  G -> PV : tieneProductosActivos()
+  activate PV
+  PV --> G : Boolean
+  deactivate PV
+  G --> P : resultado de la verificación
+  deactivate G
+  P --> U : solicitarConfirmación(advertencia si tiene productos activos)
+  U -> P : confirmarBaja()
+  P -> G : darDeBaja(proveedor)
+  activate G
+  G -> PV : darDeBaja()
+  G --> P : proveedor inactivo
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else consultar listado (1.c)
+  U -> P : consultarProveedores()
+  activate P
+  P -> G : listarProveedores()
+  activate G
+  G -> G : obtenerProveedoresConProductos()
+  G --> P : proveedores y sus productos
+  deactivate G
+  P --> U : mostrarListado()
+  deactivate P
+end
+@enduml

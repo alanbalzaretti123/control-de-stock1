@@ -1,0 +1,69 @@
+@startuml
+title DS-14 — Gestionar categorías (CU-14)
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Empleador" as U
+boundary ":PantallaCategorias" as P
+control ":GestorCategorias" as G
+entity ":Categoria" as CA
+
+alt alta de categoría (camino básico)
+  U -> P : solicitarAltaCategoria()
+  activate P
+  P --> U : solicitarDatos(nombre, descripcion)
+  U -> P : ingresarDatos(nombre, descripcion)
+  P -> G : darDeAltaCategoria(nombre, descripcion)
+  activate G
+  G -> G : buscarCategoria(nombre)
+  alt el nombre ya existe (4.a)
+    G --> P : categoría existente
+    P --> U : mostrarMensaje("La categoría ya existe")
+  else nombre nuevo
+    create entity "nueva:Categoria" as N
+    G -> N : darDeAlta()
+    G --> P : categoría registrada
+    P --> U : mostrarConfirmación()
+  end
+  deactivate G
+  deactivate P
+
+else modificar categoría (1.a)
+  U -> P : seleccionarCategoria(categoria)
+  activate P
+  P --> U : mostrarDatos(categoria)
+  U -> P : ingresarNuevosDatos(nombre, descripcion)
+  P -> G : modificarCategoria(categoria, nombre, descripcion)
+  activate G
+  G -> CA : modificar(nombre, descripcion)
+  G --> P : categoría actualizada
+  deactivate G
+  P --> U : mostrarConfirmación()
+  deactivate P
+
+else eliminar categoría (1.b)
+  U -> P : solicitarEliminacion(categoria)
+  activate P
+  P -> G : verificarEliminacion(categoria)
+  activate G
+  G -> CA : tieneProductos()
+  activate CA
+  CA --> G : Boolean
+  deactivate CA
+  alt la categoría tiene productos asociados (1.b.1.a)
+    G --> P : no se puede eliminar
+    P --> U : mostrarMensaje("La categoría tiene productos asociados")
+  else sin productos
+    G --> P : se puede eliminar
+    P --> U : solicitarConfirmación()
+    U -> P : confirmar()
+    P -> G : eliminarCategoria(categoria)
+    G -> CA : eliminar()
+    G --> P : categoría eliminada
+    P --> U : mostrarConfirmación()
+  end
+  deactivate G
+  deactivate P
+end
+@enduml
