@@ -62,10 +62,14 @@ class Usuario {
   - nombreCompleto: String
   - rol: RolUsuario
   - estadoUsuario: EstadoRegistro
-  + validarContraseña(contraseña: String): Boolean
+  + darDeAlta(): void
+  + modificar(nombreCompleto: String, rol: RolUsuario): void
+  + iniciarSesion(contraseña: String): Boolean
+  + cerrarSesion(): void
   + restablecerContraseña(nueva: String): void
   + darDeBaja(): void
   + reactivar(): void
+  + esEmpleador(): Boolean
 }
 
 class Turno {
@@ -77,7 +81,12 @@ class Turno {
   - montoContado: Decimal
   - diferenciaCaja: Decimal
   - estadoTurno: EstadoTurno
+  + abrir(tipo: TipoTurno, montoInicial: Decimal, responsable: Usuario): void
+  + estaAbierto(): Boolean
+  + registrarMovimiento(movimiento: MovimientoCaja): void
+  + calcularTotalVendido(): Decimal
   + calcularEfectivoEsperado(): Decimal
+  + calcularDiferencia(): Decimal
   + cerrar(montoContado: Decimal): void
 }
 
@@ -88,7 +97,9 @@ class MovimientoCaja {
   - medioPago: MedioPago
   - monto: Decimal
   - motivo: String
+  + registrar(): void
   + esEntrada(): Boolean
+  + esEfectivo(): Boolean
 }
 
 ' ===================== Ventas =====================
@@ -102,10 +113,16 @@ class Venta {
   - motivo: String
   + agregarProducto(producto: Producto, cantidad: Decimal): void
   + quitarProducto(producto: Producto): void
+  + modificarCantidad(producto: Producto, cantidad: Decimal): void
   + calcularTotal(): Decimal
   + registrarPago(medio: MedioPago, monto: Decimal): void
+  + validarPagos(): Boolean
+  + asignarCliente(cliente: Cliente): void
   + confirmar(): void
+  + cancelar(): void
   + anular(usuario: Usuario, motivo: String): void
+  + estaAnulada(): Boolean
+  + calcularGananciaBruta(): Decimal
 }
 
 class DetalleVenta {
@@ -114,6 +131,8 @@ class DetalleVenta {
   - costoUnitario: Decimal
   - subtotal: Decimal
   + calcularSubtotal(): Decimal
+  + modificarCantidad(cantidad: Decimal): void
+  + calcularGanancia(): Decimal
 }
 
 class DetallePago {
@@ -129,18 +148,25 @@ class Cliente {
   - telefono: String
   - saldoDeuda: Decimal
   - estadoCliente: EstadoCliente
+  + darDeAlta(): void
+  + modificar(nombre: String, apellido: String, telefono: String): void
   + estaHabilitado(): Boolean
   + habilitar(): void
   + inhabilitar(): void
   + cargarDeuda(monto: Decimal): void
   + descontarDeuda(monto: Decimal): void
+  + calcularSaldo(): Decimal
+  + consultarCuentaCorriente(): void
 }
 
 class PagoFiado {
   - numeroRecibo: Integer {id}
   - fechaPago: Date
   - montoTotal: Decimal
+  + agregarMedioPago(medio: MedioPago, monto: Decimal): void
   + calcularTotal(): Decimal
+  + validarMonto(saldo: Decimal): Boolean
+  + registrar(): void
 }
 
 class MedioPagoFiado {
@@ -160,11 +186,18 @@ class Producto {
   - stockActual: Decimal
   - stockMinimo: Decimal
   - estadoProducto: EstadoRegistro
+  + darDeAlta(): void
+  + modificar(): void
+  + darDeBaja(): void
+  + reactivar(): void
+  + estaActivo(): Boolean
   + calcularPrecioVenta(): Decimal
   + ajustarPrecioVenta(precio: Decimal): void
+  + modificarMargen(margen: Decimal): void
   + actualizarCosto(porcentaje: Decimal): void
   + descontarStock(cantidad: Decimal): void
   + reponerStock(cantidad: Decimal): void
+  + corregirStock(cantidad: Decimal): void
   + requiereReposicion(): Boolean
 }
 
@@ -172,6 +205,10 @@ class Categoria {
   - idCategoria: Integer {id}
   - nombreCategoria: String
   - descripcionCategoria: String
+  + darDeAlta(): void
+  + modificar(nombre: String, descripcion: String): void
+  + eliminar(): void
+  + tieneProductos(): Boolean
 }
 
 ' ===================== Proveedores y mercadería =====================
@@ -181,7 +218,12 @@ class Proveedor {
   - telefono: String
   - email: String
   - estadoProveedor: EstadoRegistro
+  + darDeAlta(): void
+  + modificar(): void
   + darDeBaja(): void
+  + reactivar(): void
+  + tieneProductosActivos(): Boolean
+  + obtenerIngresosPendientes(): void
 }
 
 class Direccion {
@@ -196,7 +238,10 @@ class IngresoMercaderia {
   - numeroRemito: String
   - fechaIngreso: Date
   - montoTotal: Decimal
+  + agregarProducto(producto: Producto, cantidad: Decimal): void
+  + registrar(): void
   + calcularSaldoPendiente(): Decimal
+  + estaPagado(): Boolean
 }
 
 class DetalleIngreso {
@@ -209,6 +254,8 @@ class PagoProveedor {
   - medioPago: MedioPago
   - monto: Decimal
   - concepto: String
+  + validarMonto(saldoPendiente: Decimal): Boolean
+  + registrar(): void
 }
 
 ' ===================== Relaciones =====================
