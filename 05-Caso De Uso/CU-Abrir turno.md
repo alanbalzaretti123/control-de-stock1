@@ -17,11 +17,15 @@ No debe existir otro turno abierto. <br>
 1.a.1 El sistema informa que debe cerrarse el turno abierto antes de abrir uno nuevo. Fin del caso de uso. <br>
 **3.a** El monto inicial ingresado es inválido (negativo o no numérico). <br>
 3.a.1 El sistema informa que el monto es inválido. Vuelve al paso 3. <br>
-**3.b** Ya existe un turno del mismo tipo en la fecha actual. <br>
-3.b.1 El sistema informa que ese turno ya fue registrado. Vuelve al paso 3. <br>
+**3.b** Ya existe un turno del mismo tipo en la fecha actual (fue cerrado) y el usuario tiene rol Empleador. <br>
+3.b.1 El sistema informa que el turno ya fue cerrado y pregunta si desea reabrirlo. <br>
+3.b.2 El empleador confirma. <br>
+3.b.3 El sistema reabre el turno, descartando el efectivo contado y la diferencia del cierre anterior, y lo deja disponible para registrar operaciones. Fin del caso de uso. <br>
+**3.c** Ya existe un turno del mismo tipo en la fecha actual (fue cerrado) y el usuario tiene rol Empleado. <br>
+3.c.1 El sistema informa que ese turno ya fue cerrado y que solo el empleador puede reabrirlo. Fin del caso de uso. <br>
 
-**Escenario de éxito:** el turno queda abierto y se pueden registrar operaciones de caja. <br>
+**Escenario de éxito:** el turno queda abierto (o reabierto por el empleador) y se pueden registrar operaciones de caja. <br>
 
-**Escenario de fracaso:** el turno no se abre porque ya hay un turno abierto o porque ese turno ya fue registrado en la fecha. <br>
+**Escenario de fracaso:** el turno no se abre porque ya hay un turno abierto, o porque ese turno ya fue cerrado en la fecha y el usuario no es el empleador. <br>
 
 **Postcondiciones:** existe un turno abierto con su monto inicial de caja; la fecha del turno es la fecha de apertura.

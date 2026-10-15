@@ -82,6 +82,7 @@ class Turno {
   - diferenciaCaja: Decimal
   - estadoTurno: EstadoTurno
   + abrir(tipo: TipoTurno, montoInicial: Decimal, responsable: Usuario): void
+  + reabrir(): void
   + estaAbierto(): Boolean
   + registrarMovimiento(movimiento: MovimientoCaja): void
   + calcularTotalVendido(): Decimal

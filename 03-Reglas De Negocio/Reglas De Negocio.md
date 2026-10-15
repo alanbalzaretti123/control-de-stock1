@@ -50,7 +50,7 @@ Solo puede existir un turno abierto a la vez. No se podrá abrir un turno nuevo 
 No se podrán registrar ventas, anulaciones de ventas, pagos de fiado, pagos a proveedores, retiros ni aportes si no hay un turno abierto.
 
 ### 06 — Turno cerrado
-Una vez cerrado, un turno no puede modificarse ni se le pueden registrar nuevas operaciones.
+Una vez cerrado, un turno no puede modificarse ni se le pueden registrar nuevas operaciones. Solo el empleador puede reabrir un turno del día que fue cerrado por error, siempre que no haya otro turno abierto; al reabrirlo se descartan el efectivo contado y la diferencia del cierre anterior, y al volver a cerrarlo se realiza un nuevo arqueo.
 
 ### 07 — Arqueo ciego
 Al cerrar el turno, el usuario debe ingresar el efectivo contado antes de que el sistema le muestre el efectivo esperado.
