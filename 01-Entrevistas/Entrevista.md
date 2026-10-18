@@ -35,7 +35,8 @@
 *   **Rta:** Lo usarían los empleados y yo. Los empleados deberían poder registrar ventas y consultar el stock disponible. Las tareas más delicadas, como modificar el stock, dar de alta o baja productos , eliminar registros y ver la ganancia bruta, las haría solo yo (empleador). También quiero poder imprimir reportes.
 
 **10) ¿Venden fiado?**
-*   **Rta:** Se vende solo fiado a clientes del barrio y se anotan en un cuadernillo el importe y el nombre y apellido. Si un cliente viene a comprar pero tiene una deuda muy vieja o excedida, no se le fía en esos casos.<br>
+*   **Rta:** Se vende solo fiado a clientes del barrio y se anotan en un cuadernillo el importe y el nombre y apellido. Si un cliente viene a comprar pero tiene una deuda muy vieja o excedida, no se le fía en esos casos.
+
 **11) ¿El cliente puede pagar solo un porcentaje de lo que adeuda?  ejemplo: debe 20000 y solo tiene 15000 para pagar.** <br>
 *   **Rta:**Si, se puede cancelar solo un porcentaje de la deuda.<br>
 
