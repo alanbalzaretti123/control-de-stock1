@@ -4,50 +4,46 @@ title DS-03 — Cerrar turno (CU-03)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaTurno" as P
-control ":GestorTurno" as G
-entity ":Turno" as T
-entity ":MovimientoCaja" as M
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorCerrarTurno" as C
+participant "rt:«Singleton» RegistroTurnos" as RT
+participant "t:Turno" as T
+participant "«multiobjeto»\nmovimientos:MovimientoCaja" as M
 
-U -> P : solicitarCierreTurno()
-activate P
-P -> G : iniciarCierre()
-activate G
-G -> G : buscarTurnoAbierto()
-G --> P : turno abierto
-deactivate G
-P --> U : solicitarEfectivoContado()
-note right of P : No se muestra el efectivo\nesperado (arqueo ciego)
+U -> C : iniciarCierreTurno()
+activate C
+C -> RT : buscarTurnoAbierto()
+activate RT
+RT --> C : «t : Turno»
+deactivate RT
+C --> U : «solicitar efectivo contado»
+note right of C : no se muestra el efectivo\nesperado (arqueo ciego)
+deactivate C
 
-U -> P : ingresarEfectivoContado(montoContado)
-P -> G : cerrarTurno(montoContado)
-activate G
-G -> G : validarMonto(montoContado)
-
-alt monto inválido (3.a)
-  G --> P : monto inválido
-  P --> U : mostrarMensaje("El monto ingresado es inválido")
+U -> C : ingresarEfectivoContado(montoContado : Real)
+activate C
+alt montoContado < 0 o no numérico (3.a)
+  C --> U : «monto inválido»
 else monto válido
-  G -> T : cerrar(montoContado)
+  C -> T : cerrar(montoContado : Real)
   activate T
   T -> T : calcularEfectivoEsperado()
-  loop por cada movimiento del turno
+  loop para cada m en movimientos
     T -> M : esEfectivo()
     activate M
-    M --> T : Boolean
+    M --> T : «Boolean»
     T -> M : esEntrada()
-    M --> T : Boolean
+    M --> T : «Boolean»
     deactivate M
   end
+  note right of T : esperado = montoInicial\n+ entradas en efectivo\n− salidas en efectivo
   T -> T : calcularDiferencia()
-  T --> G : resumen del cierre
+  note right of T : diferencia = contado − esperado
+  T --> C
   deactivate T
-  G --> P : resumen del cierre
-  P --> U : mostrarResumen(montoInicial, entradas y salidas por medio de pago,\nefectivo esperado, efectivo contado, diferencia)
+  C --> U : «resumen: monto inicial, entradas y salidas,\nesperado, contado y diferencia»
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

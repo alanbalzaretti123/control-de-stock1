@@ -4,40 +4,32 @@ title DS-04 — Registrar movimiento de caja (CU-04)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaCaja" as P
-control ":GestorCaja" as G
-entity ":Turno" as T
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorMovimientoCaja" as C
+participant "rt:«Singleton» RegistroTurnos" as RT
+participant "t:Turno" as T
+participant "«multiobjeto»\nmovimientos:MovimientoCaja" as MS
 
-U -> P : solicitarMovimientoCaja()
-activate P
-P --> U : solicitarDatos(tipoMovimiento, monto, motivo)
-
-U -> P : ingresarDatos(tipoMovimiento, monto, motivo)
-P -> G : registrarMovimiento(tipoMovimiento, monto, motivo, usuario)
-activate G
-G -> G : validarMonto(monto)
-
-alt monto inválido (3.a)
-  G --> P : monto inválido
-  P --> U : mostrarMensaje("El monto ingresado es inválido")
+U -> C : registrarMovimiento(tipo : TipoMovimiento, monto : Real, motivo : String)
+activate C
+alt monto <= 0 o no numérico (3.a)
+  C --> U : «monto inválido»
 else monto válido
-  G -> G : buscarTurnoAbierto()
-  create entity ":MovimientoCaja" as M
-  G -> M : registrar()
-  note right of M : tipo: retiro o aporte\nmedioPago: efectivo
-  activate M
-  M --> G : movimiento registrado
-  deactivate M
-  G -> T : registrarMovimiento(movimiento)
+  C -> RT : buscarTurnoAbierto()
+  activate RT
+  RT --> C : «t : Turno»
+  deactivate RT
+  create participant "m:MovimientoCaja" as M
+  C -->> M : create(tipo : TipoMovimiento, Efectivo, monto : Real, motivo : String, usuario : Usuario)
+  C -> M : registrar()
+  C -> T : registrarMovimiento(m : MovimientoCaja)
   activate T
-  T --> G : ok
+  T -> MS : add(m : MovimientoCaja)
+  T --> C
   deactivate T
-  G --> P : movimiento registrado
-  P --> U : mostrarConfirmación(tipo, monto, motivo)
+  C --> U : «movimiento registrado»
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

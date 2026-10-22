@@ -4,96 +4,96 @@ title DS-13 — Gestionar productos (CU-13)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleador" as U
-boundary ":PantallaProductos" as P
-control ":GestorProductos" as G
-entity ":Producto" as PR
+actor "empleador:Empleador" as U
+participant "ctrl:ControladorGestionarProductos" as C
+participant "cp:«Singleton» CatalogoProductos" as CP
+participant "ccat:«Singleton» CatalogoCategorias" as CCAT
+participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "p:Producto" as P
 
 alt alta de producto (camino básico)
-  U -> P : solicitarAltaProducto()
-  activate P
-  P --> U : solicitarDatos(código, nombre, categoría, proveedor, unidad, costo, margen, stock)
-  U -> P : ingresarDatos(datos)
-  P -> G : prepararAlta(datos)
-  activate G
-  create entity "nuevo:Producto" as N
-  G -> N : crear(datos)
-  G -> N : calcularPrecioVenta()
-  N --> G : precioVenta (redondeado a $10)
-  G --> P : precio de venta calculado
-  deactivate G
-  P --> U : mostrarPrecioVenta() y solicitarConfirmación()
-
-  opt el empleador ajusta el precio a mano (5.a)
-    U -> P : ajustarPrecio(precio)
-    P -> G : ajustarPrecio(precio)
-    activate G
-    G -> N : ajustarPrecioVenta(precio)
+  U -> C : altaProducto(codigo : String, nombre : String, idCategoria : Integer, cuit : String,\nunidad : UnidadMedida, costo : Real, margen : Real, stockInicial : Real, stockMinimo : Real)
+  activate C
+  C -> CCAT : buscarCategoria(idCategoria : Integer)
+  activate CCAT
+  CCAT --> C : «cat : Categoria»
+  deactivate CCAT
+  C -> CPV : buscarProveedor(cuit : String)
+  activate CPV
+  CPV --> C : «pv : Proveedor»
+  deactivate CPV
+  create participant "nuevo:Producto" as N
+  C -->> N : create(codigo, nombre, cat, pv, unidad, costo, margen, stockInicial, stockMinimo)
+  C -> N : calcularPrecioVenta()
+  activate N
+  N --> C : «precioVenta : Real»
+  deactivate N
+  note right of N : precio = costo * (1 + margen / 100)\nredondeado al múltiplo de $10 superior
+  C --> U : «precio de venta calculado: ¿confirma?»
+  deactivate C
+  opt ajusta el precio a mano (5.a)
+    U -> C : ajustarPrecio(precio : Real)
+    activate C
+    C -> N : ajustarPrecioVenta(precio : Real)
     note right of N : recalcula el margen
-    opt el precio queda por debajo del costo (5.b)
-      G --> P : advertencia de venta a pérdida
-      P --> U : mostrarAdvertencia()
+    opt precio < costo (5.b)
+      C --> U : «advertencia: venta a pérdida»
     end
-    G --> P : nuevo margen
-    deactivate G
-    P --> U : mostrarMargen() y solicitarConfirmación()
+    C --> U : «nuevo margen: ¿confirma?»
+    deactivate C
   end
-
-  U -> P : confirmar()
-  P -> G : darDeAlta()
-  activate G
-  G -> G : buscarProducto(codigo)
-  alt el código ya está registrado (6.a)
-    G --> P : código existente
-    P --> U : mostrarMensaje("El código ya existe")
-  else código nuevo (6)
-    G -> N : darDeAlta()
-    G --> P : producto registrado
-    P --> U : mostrarConfirmación()
+  U -> C : confirmarAlta()
+  activate C
+  C -> CP : buscarProducto(codigo : String)
+  activate CP
+  CP --> C : «existente : Producto»
+  deactivate CP
+  alt existente <> null (6.a)
+    C --> U : «el código ya existe»
+  else existente = null (6)
+    C -> N : darDeAlta()
+    C -> CP : agregarProducto(nuevo : Producto)
+    C --> U : «producto registrado»
   end
-  deactivate G
-  deactivate P
-
-else modificar producto (1.a)
-  U -> P : seleccionarProducto(producto)
-  activate P
-  P --> U : mostrarDatos(producto)
-  U -> P : ingresarNuevosValores(valores)
-  P -> G : prepararModificacion(producto, valores)
-  activate G
-  opt se modificó el costo o el margen
-    G -> PR : modificarMargen(margen)
-    G -> PR : calcularPrecioVenta()
-    PR --> G : nuevo precio de venta
+  deactivate C
+else modificar (1.a)
+  U -> C : seleccionarProducto(codigo : String)
+  activate C
+  C -> CP : buscarProducto(codigo : String)
+  activate CP
+  CP --> C : «p : Producto»
+  deactivate CP
+  C --> U : «datos actuales»
+  U -> C : ingresarNuevosValores(costo : Real, margen : Real, stockActual : Real)
+  opt cambió el costo o el margen
+    C -> P : modificarMargen(margen : Real)
+    C -> P : calcularPrecioVenta()
+    activate P
+    P --> C : «precioVenta : Real»
+    deactivate P
   end
-  opt se corrigió el stock
-    G -> PR : corregirStock(cantidad)
+  opt corrigió el stock
+    C -> P : corregirStock(cantidad : Real)
   end
-  G --> P : datos resultantes
-  deactivate G
-  P --> U : mostrarDatos() y solicitarConfirmación()
-  U -> P : confirmar()
-  P -> G : guardarModificacion()
-  activate G
-  G -> PR : modificar()
-  G --> P : producto actualizado
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
+  C --> U : «datos resultantes: ¿confirma?»
+  U -> C : confirmarModificacion()
+  C -> P : modificar()
+  C --> U : «producto actualizado»
+  deactivate C
 else dar de baja (1.b)
-  U -> P : solicitarBaja(producto)
-  activate P
-  P --> U : solicitarConfirmación()
-  U -> P : confirmar()
-  P -> G : darDeBaja(producto)
-  activate G
-  G -> PR : darDeBaja()
-  note right of PR : queda inactivo, sin borrarse\ndel historial de ventas
-  G --> P : producto inactivo
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
+  U -> C : solicitarBaja(codigo : String)
+  activate C
+  C -> CP : buscarProducto(codigo : String)
+  activate CP
+  CP --> C : «p : Producto»
+  deactivate CP
+  C --> U : «¿confirma la baja?»
+  U -> C : confirmarBaja()
+  C -> P : darDeBaja()
+  note right of P : queda inactivo, sin borrarse\ndel historial de ventas
+  C --> U : «producto dado de baja»
+  deactivate C
 end
 @enduml

@@ -4,67 +4,62 @@ title DS-14 — Gestionar categorías (CU-14)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleador" as U
-boundary ":PantallaCategorias" as P
-control ":GestorCategorias" as G
-entity ":Categoria" as CA
+actor "empleador:Empleador" as U
+participant "ctrl:ControladorGestionarCategorias" as C
+participant "ccat:«Singleton» CatalogoCategorias" as CCAT
+participant "cat:Categoria" as CA
 
 alt alta de categoría (camino básico)
-  U -> P : solicitarAltaCategoria()
-  activate P
-  P --> U : solicitarDatos(nombre, descripcion)
-  U -> P : ingresarDatos(nombre, descripcion)
-  P -> G : darDeAltaCategoria(nombre, descripcion)
-  activate G
-  G -> G : buscarCategoria(nombre)
-  alt el nombre ya existe (4.a)
-    G --> P : categoría existente
-    P --> U : mostrarMensaje("La categoría ya existe")
-  else nombre nuevo
-    create entity "nueva:Categoria" as N
-    G -> N : darDeAlta()
-    G --> P : categoría registrada
-    P --> U : mostrarConfirmación()
+  U -> C : altaCategoria(nombre : String, descripcion : String)
+  activate C
+  C -> CCAT : buscarCategoria(nombre : String)
+  activate CCAT
+  CCAT --> C : «existente : Categoria»
+  deactivate CCAT
+  alt existente <> null (4.a)
+    C --> U : «la categoría ya existe»
+  else existente = null
+    create participant "nueva:Categoria" as N
+    C -->> N : create(nombre : String, descripcion : String)
+    C -> N : darDeAlta()
+    C -> CCAT : agregarCategoria(nueva : Categoria)
+    C --> U : «categoría registrada»
   end
-  deactivate G
-  deactivate P
-
-else modificar categoría (1.a)
-  U -> P : seleccionarCategoria(categoria)
-  activate P
-  P --> U : mostrarDatos(categoria)
-  U -> P : ingresarNuevosDatos(nombre, descripcion)
-  P -> G : modificarCategoria(categoria, nombre, descripcion)
-  activate G
-  G -> CA : modificar(nombre, descripcion)
-  G --> P : categoría actualizada
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
-else eliminar categoría (1.b)
-  U -> P : solicitarEliminacion(categoria)
-  activate P
-  P -> G : verificarEliminacion(categoria)
-  activate G
-  G -> CA : tieneProductos()
+  deactivate C
+else modificar (1.a)
+  U -> C : seleccionarCategoria(idCategoria : Integer)
+  activate C
+  C -> CCAT : buscarCategoria(idCategoria : Integer)
+  activate CCAT
+  CCAT --> C : «cat : Categoria»
+  deactivate CCAT
+  C --> U : «datos de la categoría»
+  U -> C : modificarCategoria(nombre : String, descripcion : String)
+  C -> CA : modificar(nombre : String, descripcion : String)
+  C --> U : «categoría actualizada»
+  deactivate C
+else eliminar (1.b)
+  U -> C : solicitarEliminacion(idCategoria : Integer)
+  activate C
+  C -> CCAT : buscarCategoria(idCategoria : Integer)
+  activate CCAT
+  CCAT --> C : «cat : Categoria»
+  deactivate CCAT
+  C -> CA : tieneProductos()
   activate CA
-  CA --> G : Boolean
+  CA --> C : «tieneProductos : Boolean»
   deactivate CA
-  alt la categoría tiene productos asociados (1.b.1.a)
-    G --> P : no se puede eliminar
-    P --> U : mostrarMensaje("La categoría tiene productos asociados")
-  else sin productos
-    G --> P : se puede eliminar
-    P --> U : solicitarConfirmación()
-    U -> P : confirmar()
-    P -> G : eliminarCategoria(categoria)
-    G -> CA : eliminar()
-    G --> P : categoría eliminada
-    P --> U : mostrarConfirmación()
+  alt tieneProductos = true (1.b.1.a)
+    C --> U : «no se puede eliminar: tiene productos asociados»
+  else tieneProductos = false
+    C --> U : «¿confirma la eliminación?»
+    U -> C : confirmarEliminacion()
+    C -> CA : eliminar()
+    C -> CCAT : quitarCategoria(cat : Categoria)
+    C --> U : «categoría eliminada»
   end
-  deactivate G
-  deactivate P
+  deactivate C
 end
 @enduml

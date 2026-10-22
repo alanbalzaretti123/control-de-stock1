@@ -4,62 +4,61 @@ title DS-19 — Consultar balance de caja (CU-19)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaBalance" as P
-control ":GestorBalance" as G
-entity ":Usuario" as US
-entity ":Turno" as T
-entity ":MovimientoCaja" as M
-entity ":Venta" as V
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorBalanceCaja" as C
+participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as T
+participant "«multiobjeto»\nmovimientos:MovimientoCaja" as M
+participant "usuario:Usuario" as US
+participant "rv:«Singleton» RegistroVentas" as RV
+participant "«multiobjeto»\nventas:Venta" as V
 
-U -> P : seleccionarPeriodo(fecha y turno, o rango de días)
-activate P
-P -> G : generarBalance(periodo, usuario)
-activate G
-G -> G : buscarTurnos(periodo)
-
-alt no hay operaciones en el período (1.a)
-  G --> P : sin movimientos
-  P --> U : mostrarMensaje("No hay movimientos en el período seleccionado")
-else hay turnos con operaciones
-  loop por cada turno del período
-    G -> T : calcularTotalVendido()
-    T --> G : total de ventas
-    G -> T : calcularEfectivoEsperado()
+U -> C : consultarBalance(desde : Date, hasta : Date, tipo : TipoTurno)
+activate C
+C -> RT : buscarTurnos(desde : Date, hasta : Date, tipo : TipoTurno)
+activate RT
+RT --> C : «turnos : List<Turno>»
+deactivate RT
+alt turnos está vacía (1.a)
+  C --> U : «no hay movimientos en el período seleccionado»
+else hay turnos (2)
+  loop para cada t en turnos
+    C -> T : calcularTotalVendido()
     activate T
-    loop por cada movimiento del turno
+    T --> C : «totalVendido : Real»
+    C -> T : calcularEfectivoEsperado()
+    loop para cada m en movimientos de t
       T -> M : esEfectivo()
       T -> M : esEntrada()
     end
-    T --> G : efectivo esperado
+    T --> C : «esperado : Real»
+    C -> T : calcularDiferencia()
+    T --> C : «diferencia : Real»
     deactivate T
-    G -> T : calcularDiferencia()
-    T --> G : diferencia de caja
   end
-
-  G -> US : esEmpleador()
+  C -> US : esEmpleador()
   activate US
-  US --> G : rol
+  US --> C : «esEmpleador : Boolean»
   deactivate US
-  opt el usuario es Empleador (2.a)
-    loop por cada venta no anulada del período
-      G -> V : calcularGananciaBruta()
-      V --> G : ganancia
+  opt esEmpleador = true (2.a)
+    C -> RV : buscarVentas(desde : Date, hasta : Date)
+    activate RV
+    RV --> C : «ventas : List<Venta>»
+    deactivate RV
+    loop para cada v no anulada en ventas
+      C -> V : calcularGananciaBruta()
+      activate V
+      V --> C : «ganancia : Real»
+      deactivate V
     end
   end
-
-  G --> P : balance
-  P --> U : mostrarBalance(monto inicial, ventas, entradas y salidas,\nesperado, contado, diferencia, detalle de operaciones)
-
+  C --> U : «balance: monto inicial, ventas, entradas y salidas,\nesperado, contado, diferencia y detalle»
   opt el empleador pide imprimir (2.b)
-    U -> P : imprimirBalance()
-    P -> G : generarDocumento()
-    G --> P : documento imprimible
-    P --> U : mostrarDocumento()
+    U -> C : imprimirBalance()
+    C --> U : «documento imprimible»
   end
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

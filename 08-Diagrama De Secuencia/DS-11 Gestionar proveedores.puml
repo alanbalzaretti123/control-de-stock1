@@ -4,75 +4,68 @@ title DS-11 — Gestionar proveedores (CU-11)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleador" as U
-boundary ":PantallaProveedores" as P
-control ":GestorProveedores" as G
-entity ":Proveedor" as PV
+actor "empleador:Empleador" as U
+participant "ctrl:ControladorGestionarProveedores" as C
+participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "pv:Proveedor" as PV
 
 alt alta de proveedor (camino básico)
-  U -> P : solicitarAltaProveedor()
-  activate P
-  P --> U : solicitarDatos(cuit, razonSocial, telefono, email, direccion)
-  U -> P : ingresarDatos(cuit, razonSocial, telefono, email, direccion)
-  P -> G : darDeAltaProveedor(datos)
-  activate G
-  G -> G : buscarProveedor(cuit)
-  alt el CUIT ya está registrado (4.a)
-    G --> P : CUIT existente
-    P --> U : mostrarMensaje("El CUIT ya está registrado")
-  else CUIT nuevo
-    create entity "nuevo:Proveedor" as N
-    G -> N : darDeAlta()
-    G --> P : proveedor registrado
-    P --> U : mostrarConfirmación()
+  U -> C : altaProveedor(cuit : String, razonSocial : String, telefono : String, email : String, direccion : Direccion)
+  activate C
+  C -> CPV : buscarProveedor(cuit : String)
+  activate CPV
+  CPV --> C : «existente : Proveedor»
+  deactivate CPV
+  alt existente <> null (4.a)
+    C --> U : «el CUIT ya está registrado»
+  else existente = null
+    create participant "nuevo:Proveedor" as N
+    C -->> N : create(cuit : String, razonSocial : String, telefono : String, email : String)
+    create participant "d:Direccion" as DI
+    N -->> DI : create(calle : String, numero : String, codigoPostal : String, localidad : String)
+    C -> N : darDeAlta()
+    C -> CPV : agregarProveedor(nuevo : Proveedor)
+    C --> U : «proveedor registrado»
   end
-  deactivate G
-  deactivate P
-
-else modificar proveedor (1.a)
-  U -> P : seleccionarProveedor(proveedor)
-  activate P
-  P --> U : mostrarDatos(proveedor)
-  U -> P : ingresarNuevosDatos(datos)
-  P -> G : modificarProveedor(proveedor, datos)
-  activate G
-  G -> PV : modificar()
-  G --> P : proveedor actualizado
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
+  deactivate C
+else modificar (1.a)
+  U -> C : seleccionarProveedor(cuit : String)
+  activate C
+  C -> CPV : buscarProveedor(cuit : String)
+  activate CPV
+  CPV --> C : «pv : Proveedor»
+  deactivate CPV
+  C --> U : «datos del proveedor»
+  U -> C : modificarProveedor(razonSocial : String, telefono : String, email : String, direccion : Direccion)
+  C -> PV : modificar()
+  C --> U : «proveedor actualizado»
+  deactivate C
 else dar de baja (1.b)
-  U -> P : solicitarBaja(proveedor)
-  activate P
-  P -> G : verificarBaja(proveedor)
-  activate G
-  G -> PV : tieneProductosActivos()
+  U -> C : solicitarBaja(cuit : String)
+  activate C
+  C -> CPV : buscarProveedor(cuit : String)
+  activate CPV
+  CPV --> C : «pv : Proveedor»
+  deactivate CPV
+  C -> PV : tieneProductosActivos()
   activate PV
-  PV --> G : Boolean
+  PV --> C : «tieneProductos : Boolean»
   deactivate PV
-  G --> P : resultado de la verificación
-  deactivate G
-  P --> U : solicitarConfirmación(advertencia si tiene productos activos)
-  U -> P : confirmarBaja()
-  P -> G : darDeBaja(proveedor)
-  activate G
-  G -> PV : darDeBaja()
-  G --> P : proveedor inactivo
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
+  C --> U : «¿confirma la baja? (con advertencia si tiene productos activos)»
+  U -> C : confirmarBaja()
+  C -> PV : darDeBaja()
+  C --> U : «proveedor dado de baja»
+  deactivate C
 else consultar listado (1.c)
-  U -> P : consultarProveedores()
-  activate P
-  P -> G : listarProveedores()
-  activate G
-  G -> G : obtenerProveedoresConProductos()
-  G --> P : proveedores y sus productos
-  deactivate G
-  P --> U : mostrarListado()
-  deactivate P
+  U -> C : consultarProveedores()
+  activate C
+  C -> CPV : obtenerProveedoresConProductos()
+  activate CPV
+  CPV --> C : «proveedores : List<Proveedor>»
+  deactivate CPV
+  C --> U : «listado de proveedores y sus productos»
+  deactivate C
 end
 @enduml

@@ -4,82 +4,81 @@ title DS-08 — Gestionar clientes (CU-08)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaClientes" as P
-control ":GestorClientes" as G
-entity ":Cliente" as C
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorGestionarClientes" as C
+participant "cc:«Singleton» CatalogoClientes" as CC
+participant "c:Cliente" as CL
 
 alt alta de cliente (camino básico)
-  U -> P : solicitarAltaCliente()
-  activate P
-  P --> U : solicitarDatos(nombre, apellido, telefono)
-  U -> P : ingresarDatos(nombre, apellido, telefono)
-  P -> G : darDeAltaCliente(nombre, apellido, telefono)
-  activate G
-  G -> G : buscarCliente(nombre, apellido)
-  opt ya existe un cliente con el mismo nombre y apellido (3.a)
-    G --> P : posible duplicado
-    P --> U : mostrarAdvertencia(cliente existente)
-    U -> P : confirmarQueEsOtraPersona()
-    P -> G : confirmarAlta()
+  U -> C : altaCliente(nombre : String, apellido : String, telefono : String)
+  activate C
+  C -> CC : buscarCliente(nombre : String, apellido : String)
+  activate CC
+  CC --> C : «existente : Cliente»
+  deactivate CC
+  opt existente <> null (3.a)
+    C --> U : «ya existe un cliente con ese nombre»
+    U -> C : confirmarOtraPersona()
   end
-  create entity "nuevo:Cliente" as N
-  G -> N : darDeAlta()
+  create participant "nuevo:Cliente" as N
+  C -->> N : create(nombre : String, apellido : String, telefono : String)
+  C -> N : darDeAlta()
   note right of N : habilitado para fiado\ny saldo en cero
-  G --> P : cliente registrado
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
-else modificar datos (1.a) — solo Empleador
-  U -> P : seleccionarCliente(cliente)
-  activate P
-  P --> U : mostrarDatos(cliente)
-  U -> P : ingresarNuevosDatos(nombre, apellido, telefono)
-  P -> G : modificarCliente(cliente, datos)
-  activate G
-  G -> C : modificar(nombre, apellido, telefono)
-  G --> P : cliente actualizado
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
-else habilitar / inhabilitar (1.b) — solo Empleador
-  U -> P : seleccionarCambioEstado(cliente)
-  activate P
-  P -> G : obtenerEstado(cliente)
-  activate G
-  G -> C : calcularSaldo()
-  C --> G : saldo
-  G --> P : estado y saldo
-  deactivate G
-  P --> U : solicitarConfirmación(estado, saldo)
-  U -> P : confirmar()
-  P -> G : cambiarEstado(cliente)
-  activate G
-  alt el cliente está habilitado
-    G -> C : inhabilitar()
-  else el cliente está inhabilitado
-    G -> C : habilitar()
+  C -> CC : agregarCliente(nuevo : Cliente)
+  C --> U : «cliente registrado»
+  deactivate C
+else modificar datos — solo Empleador (1.a)
+  U -> C : seleccionarCliente(idCliente : Integer)
+  activate C
+  C -> CC : buscarCliente(idCliente : Integer)
+  activate CC
+  CC --> C : «c : Cliente»
+  deactivate CC
+  C --> U : «datos del cliente»
+  U -> C : modificarCliente(nombre : String, apellido : String, telefono : String)
+  C -> CL : modificar(nombre : String, apellido : String, telefono : String)
+  C --> U : «cliente actualizado»
+  deactivate C
+else habilitar o inhabilitar — solo Empleador (1.b)
+  U -> C : seleccionarCliente(idCliente : Integer)
+  activate C
+  C -> CC : buscarCliente(idCliente : Integer)
+  activate CC
+  CC --> C : «c : Cliente»
+  deactivate CC
+  C -> CL : calcularSaldo()
+  activate CL
+  CL --> C : «saldo : Real»
+  deactivate CL
+  C --> U : «estado y saldo: ¿confirma el cambio?»
+  U -> C : confirmarCambioEstado()
+  C -> CL : estaHabilitado()
+  activate CL
+  CL --> C : «habilitado : Boolean»
+  deactivate CL
+  alt habilitado = true
+    C -> CL : inhabilitar()
+  else habilitado = false
+    C -> CL : habilitar()
   end
-  G --> P : estado actualizado
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
-else consultar cuenta corriente (1.c) — solo Empleador
-  U -> P : consultarCuentaCorriente(cliente)
-  activate P
-  P -> G : consultarCuentaCorriente(cliente)
-  activate G
-  G -> C : consultarCuentaCorriente()
-  C --> G : ventas fiadas y pagos
-  G -> C : calcularSaldo()
-  C --> G : saldo
-  G --> P : cuenta corriente
-  deactivate G
-  P --> U : mostrarCuentaCorriente(saldo, movimientos ordenados por fecha)
-  deactivate P
+  C --> U : «estado actualizado»
+  deactivate C
+else consultar cuenta corriente — solo Empleador (1.c)
+  U -> C : consultarCuentaCorriente(idCliente : Integer)
+  activate C
+  C -> CC : buscarCliente(idCliente : Integer)
+  activate CC
+  CC --> C : «c : Cliente»
+  deactivate CC
+  C -> CL : consultarCuentaCorriente()
+  activate CL
+  CL --> C : «ventas fiadas y pagos»
+  C -> CL : calcularSaldo()
+  CL --> C : «saldo : Real»
+  deactivate CL
+  C --> U : «saldo y movimientos ordenados por fecha»
+  deactivate C
 end
 @enduml

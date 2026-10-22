@@ -4,63 +4,73 @@ title DS-09 — Registrar ingreso de mercadería (CU-09)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaIngreso" as P
-control ":GestorIngreso" as G
-entity ":Producto" as PR
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorIngresoMercaderia" as C
+participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "cp:«Singleton» CatalogoProductos" as CP
+participant "p:Producto" as P
+participant "ri:«Singleton» RegistroIngresos" as RI
 
-U -> P : iniciarIngreso(proveedor, numeroRemito)
-activate P
-P -> G : nuevoIngreso(proveedor, numeroRemito, usuario)
-activate G
-create entity ":IngresoMercaderia" as I
-G -> I : crear(proveedor, numeroRemito, usuario)
-G --> P : ingreso iniciado
-deactivate G
+U -> C : crearNuevoIngreso(cuit : String, numeroRemito : String)
+activate C
+C -> CPV : buscarProveedor(cuit : String)
+activate CPV
+CPV --> C : «pv : Proveedor»
+deactivate CPV
+create participant "i:IngresoMercaderia" as I
+C -->> I : create(pv : Proveedor, numeroRemito : String, usuario : Usuario)
+C --> U
+deactivate C
 
-loop por cada producto recibido
-  U -> P : agregarProducto(codigo, cantidad)
-  P -> G : agregarProducto(codigo, cantidad)
-  activate G
-  G -> G : buscarProducto(codigo)
-  G -> I : agregarProducto(producto, cantidad)
+loop más productos recibidos
+  U -> C : introducirProducto(codigo : String, cantidad : Real)
+  activate C
+  C -> CP : buscarProducto(codigo : String)
+  activate CP
+  CP --> C : «p : Producto»
+  deactivate CP
+  C -> I : agregarProducto(p : Producto, cantidad : Real)
   activate I
-  create entity ":DetalleIngreso" as DI
-  I -> DI : crear(producto, cantidad)
+  create participant "di:DetalleIngreso" as DI
+  I -->> DI : create(p : Producto, cantidad : Real)
+  participant "«multiobjeto»\ndetalles:DetalleIngreso" as DS
+  I -> DS : add(di : DetalleIngreso)
+  I --> C
   deactivate I
-  G --> P : línea agregada
-  deactivate G
+  C --> U : «línea agregada»
+  deactivate C
 end
 
-U -> P : ingresarImporteTotal(montoTotal)
-P --> U : mostrarResumen() y solicitarConfirmación()
-U -> P : confirmarIngreso()
-P -> G : confirmarIngreso(montoTotal)
-activate G
-G -> I : registrar()
+U -> C : finalizarIngreso(montoTotal : Real)
+activate C
+C --> U : «resumen del ingreso: ¿confirma?»
+deactivate C
+U -> C : confirmarIngreso()
+activate C
+C -> I : registrar()
 activate I
-loop por cada línea del ingreso
-  I -> PR : reponerStock(cantidad)
+loop para cada di en detalles
+  I -> P : reponerStock(cantidad : Real)
 end
+I --> C
 deactivate I
-G --> P : ingreso registrado
-deactivate G
-P --> U : preguntarPago()
+C -> RI : agregarIngreso(i : IngresoMercaderia)
+C --> U : «ingreso registrado: ¿paga en el momento?»
+deactivate C
 
 alt el pago se realiza en el momento (5 y 6)
-  U -> P : indicarPagoEnElMomento()
-  ref over U, P, G : DS-10 Registrar pago a proveedor (para el ingreso registrado)
+  U -> C : pagarEnElMomento()
+  ref over U, C : DS-10 Registrar pago a proveedor (para el ingreso i)
 else el pago queda pendiente (5.a)
-  U -> P : indicarPagoPendiente()
-  P -> G : dejarPendiente()
-  activate G
-  G -> I : calcularSaldoPendiente()
-  I --> G : saldo = importe total
-  G --> P : ingreso pendiente de pago
-  deactivate G
-  P --> U : mostrarConfirmación("Ingreso registrado con pago pendiente")
+  U -> C : dejarPagoPendiente()
+  activate C
+  C -> I : calcularSaldoPendiente()
+  activate I
+  I --> C : «saldo : Real»
+  deactivate I
+  C --> U : «ingreso con pago pendiente»
+  deactivate C
 end
-
-deactivate P
 @enduml

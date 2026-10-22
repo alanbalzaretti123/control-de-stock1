@@ -4,39 +4,35 @@ title DS-17 — Consultar productos a reponer (CU-17)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaReposicion" as P
-control ":GestorStock" as G
-entity ":Producto" as PR
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorProductosAReponer" as C
+participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nactivos:Producto" as P
 
-U -> P : consultarReposicion(proveedor, categoria)
-activate P
-P -> G : obtenerProductosAReponer(proveedor, categoria)
-activate G
-G -> G : buscarProductosActivos(proveedor, categoria)
-loop por cada producto activo
-  G -> PR : requiereReposicion()
-  activate PR
-  PR --> G : Boolean
-  deactivate PR
+U -> C : consultarProductosAReponer(cuit : String, idCategoria : Integer)
+activate C
+C -> CP : buscarProductosActivos(cuit : String, idCategoria : Integer)
+activate CP
+CP --> C : «activos : List<Producto>»
+deactivate CP
+loop para cada p en activos
+  C -> P : requiereReposicion()
+  activate P
+  P --> C : «aReponer : Boolean»
+  deactivate P
 end
-
-alt no hay productos a reponer (2.a)
-  G --> P : lista vacía
-  P --> U : mostrarMensaje("No hay productos a reponer")
-else hay productos a reponer
-  G -> G : agruparPorProveedor()
-  G --> P : productos a reponer
-  P --> U : mostrarLista(nombre, stock actual, stock mínimo, unidad)
-  opt el usuario pide imprimir (2.b)
-    U -> P : imprimirLista()
-    P -> G : generarDocumento()
-    G --> P : documento imprimible
-    P --> U : mostrarDocumento()
+note right of C : requiere reposición si\nstockActual <= stockMinimo
+alt ningún producto a reponer (2.a)
+  C --> U : «no hay productos a reponer»
+else hay productos a reponer (2)
+  C -> C : agruparPorProveedor()
+  C --> U : «lista: nombre, stock actual, stock mínimo y unidad»
+  opt pide imprimir (2.b)
+    U -> C : imprimirLista()
+    C --> U : «documento imprimible»
   end
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

@@ -4,44 +4,41 @@ title DS-01 — Iniciar sesión (CU-01)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaInicioSesion" as P
-control ":GestorSesion" as G
-entity ":Usuario" as E
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorIniciarSesion" as C
+participant "cu:«Singleton» CatalogoUsuarios" as CU
+participant "u:Usuario" as US
 
-U -> P : ingresarCredenciales(nombreUsuario, contraseña)
-activate P
-P -> G : iniciarSesion(nombreUsuario, contraseña)
-activate G
-G -> G : buscarUsuario(nombreUsuario)
-
-alt el usuario existe
-  G -> E : iniciarSesion(contraseña)
-  activate E
-  E --> G : resultado
-  deactivate E
-
-  alt credenciales válidas y usuario activo
-    G -> E : esEmpleador()
-    activate E
-    E --> G : rol
-    deactivate E
-    G --> P : sesión iniciada (rol)
-    P --> U : mostrarMenú(funcionalidades del rol)
-  else contraseña incorrecta (2.a)
-    G --> P : credenciales incorrectas
-    P --> U : mostrarMensaje("Usuario o contraseña incorrectos")
-  else usuario inactivo (2.b)
-    G --> P : usuario inactivo
-    P --> U : mostrarMensaje("Usuario dado de baja: contacte al empleador")
+U -> C : iniciarSesion(nombreUsuario : String, contraseña : String)
+activate C
+C -> CU : buscarUsuario(nombreUsuario : String)
+activate CU
+CU --> C : «u : Usuario»
+deactivate CU
+alt u = null (2.a)
+  C --> U : «credenciales incorrectas»
+else u <> null
+  C -> US : iniciarSesion(contraseña : String)
+  activate US
+  US --> C : «valida : Boolean»
+  deactivate US
+  C -> US : getEstadoUsuario()
+  activate US
+  US --> C : «estado : EstadoRegistro»
+  deactivate US
+  alt valida = false (2.a)
+    C --> U : «credenciales incorrectas»
+  else estado = Inactivo (2.b)
+    C --> U : «usuario dado de baja: contactar al empleador»
+  else valida y estado = Activo
+    C -> US : esEmpleador()
+    activate US
+    US --> C : «esEmpleador : Boolean»
+    deactivate US
+    C --> U : «funcionalidades habilitadas según el rol»
   end
-
-else el usuario no existe (2.a)
-  G --> P : credenciales incorrectas
-  P --> U : mostrarMensaje("Usuario o contraseña incorrectos")
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

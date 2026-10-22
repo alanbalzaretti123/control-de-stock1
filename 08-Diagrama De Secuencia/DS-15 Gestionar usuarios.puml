@@ -4,92 +4,91 @@ title DS-15 — Gestionar usuarios (CU-15)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleador" as U
-boundary ":PantallaUsuarios" as P
-control ":GestorUsuarios" as G
-entity ":Usuario" as US
+actor "empleador:Empleador" as U
+participant "ctrl:ControladorGestionarUsuarios" as C
+participant "cu:«Singleton» CatalogoUsuarios" as CU
+participant "u:Usuario" as US
 
 alt alta de usuario (camino básico)
-  U -> P : solicitarAltaUsuario()
-  activate P
-  P --> U : solicitarDatos(nombreUsuario, nombreCompleto, rol, contraseña)
-  U -> P : ingresarDatos(datos)
-  P -> G : darDeAltaUsuario(datos)
-  activate G
-  G -> G : buscarUsuario(nombreUsuario)
-  alt el nombre de usuario ya existe (4.a)
-    G --> P : usuario existente
-    P --> U : mostrarMensaje("El nombre de usuario ya existe")
-  else nombre nuevo
-    create entity "nuevo:Usuario" as N
-    G -> N : darDeAlta()
-    G --> P : usuario registrado (activo)
-    P --> U : mostrarConfirmación()
+  U -> C : altaUsuario(nombreUsuario : String, nombreCompleto : String, rol : RolUsuario, contraseña : String)
+  activate C
+  C -> CU : buscarUsuario(nombreUsuario : String)
+  activate CU
+  CU --> C : «existente : Usuario»
+  deactivate CU
+  alt existente <> null (4.a)
+    C --> U : «el nombre de usuario ya existe»
+  else existente = null
+    create participant "nuevo:Usuario" as N
+    C -->> N : create(nombreUsuario : String, nombreCompleto : String, rol : RolUsuario, contraseña : String)
+    C -> N : darDeAlta()
+    C -> CU : agregarUsuario(nuevo : Usuario)
+    C --> U : «usuario registrado (activo)»
   end
-  deactivate G
-  deactivate P
-
-else modificar usuario (1.a)
-  U -> P : seleccionarUsuario(usuario)
-  activate P
-  P --> U : mostrarDatos(nombreCompleto, rol)
-  U -> P : ingresarNuevosDatos(nombreCompleto, rol)
-  P -> G : modificarUsuario(usuario, nombreCompleto, rol)
-  activate G
-  G -> G : verificarEmpleadorActivo()
-  alt quedaría sin ningún empleador activo (1.a.2.a)
-    G --> P : cambio no permitido
-    P --> U : mostrarMensaje("Debe existir al menos un empleador activo")
+  deactivate C
+else modificar (1.a)
+  U -> C : seleccionarUsuario(nombreUsuario : String)
+  activate C
+  C -> CU : buscarUsuario(nombreUsuario : String)
+  activate CU
+  CU --> C : «u : Usuario»
+  deactivate CU
+  C --> U : «nombre completo y rol»
+  U -> C : modificarUsuario(nombreCompleto : String, rol : RolUsuario)
+  C -> CU : contarEmpleadoresActivos()
+  activate CU
+  CU --> C : «cantidad : Integer»
+  deactivate CU
+  alt el cambio deja sin empleadores activos (1.a.2.a)
+    C --> U : «debe existir al menos un empleador activo»
   else cambio permitido
-    G -> US : modificar(nombreCompleto, rol)
-    G --> P : usuario actualizado
-    P --> U : mostrarConfirmación()
+    C -> US : modificar(nombreCompleto : String, rol : RolUsuario)
+    C --> U : «usuario actualizado»
   end
-  deactivate G
-  deactivate P
-
+  deactivate C
 else restablecer contraseña (1.b)
-  U -> P : solicitarRestablecerContraseña(usuario)
-  activate P
-  P --> U : solicitarNuevaContraseña()
-  U -> P : ingresarNuevaContraseña(contraseña)
-  P -> G : restablecerContraseña(usuario, contraseña)
-  activate G
-  G -> US : restablecerContraseña(contraseña)
-  G --> P : contraseña actualizada
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
-
+  U -> C : solicitarRestablecerContraseña(nombreUsuario : String)
+  activate C
+  C -> CU : buscarUsuario(nombreUsuario : String)
+  activate CU
+  CU --> C : «u : Usuario»
+  deactivate CU
+  C --> U : «solicitar nueva contraseña»
+  U -> C : ingresarNuevaContraseña(contraseña : String)
+  C -> US : restablecerContraseña(contraseña : String)
+  C --> U : «contraseña actualizada»
+  deactivate C
 else dar de baja (1.c)
-  U -> P : solicitarBaja(usuario)
-  activate P
-  P --> U : solicitarConfirmación()
-  U -> P : confirmar()
-  P -> G : darDeBaja(usuario)
-  activate G
-  G -> G : verificarEmpleadorActivo()
-  alt quedaría sin ningún empleador activo (1.c.2.a)
-    G --> P : baja no permitida
-    P --> U : mostrarMensaje("Debe existir al menos un empleador activo")
+  U -> C : solicitarBaja(nombreUsuario : String)
+  activate C
+  C -> CU : buscarUsuario(nombreUsuario : String)
+  activate CU
+  CU --> C : «u : Usuario»
+  deactivate CU
+  C --> U : «¿confirma la baja?»
+  U -> C : confirmarBaja()
+  C -> CU : contarEmpleadoresActivos()
+  activate CU
+  CU --> C : «cantidad : Integer»
+  deactivate CU
+  alt u es el único empleador activo (1.c.2.a)
+    C --> U : «debe existir al menos un empleador activo»
   else baja permitida
-    G -> US : darDeBaja()
-    G --> P : usuario inactivo
-    P --> U : mostrarConfirmación()
+    C -> US : darDeBaja()
+    C --> U : «usuario dado de baja»
   end
-  deactivate G
-  deactivate P
-
+  deactivate C
 else reactivar (1.d)
-  U -> P : solicitarReactivacion(usuario)
-  activate P
-  P -> G : reactivar(usuario)
-  activate G
-  G -> US : reactivar()
-  G --> P : usuario activo
-  deactivate G
-  P --> U : mostrarConfirmación()
-  deactivate P
+  U -> C : reactivarUsuario(nombreUsuario : String)
+  activate C
+  C -> CU : buscarUsuario(nombreUsuario : String)
+  activate CU
+  CU --> C : «u : Usuario»
+  deactivate CU
+  C -> US : reactivar()
+  C --> U : «usuario activo»
+  deactivate C
 end
 @enduml

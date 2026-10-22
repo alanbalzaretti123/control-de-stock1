@@ -4,57 +4,75 @@ title DS-18 — Consultar reportes de ventas (CU-18)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleador" as U
-boundary ":PantallaReportes" as P
-control ":GestorReportes" as G
-entity ":Venta" as V
-entity ":DetalleVenta" as D
-entity ":Turno" as T
+actor "empleador:Empleador" as U
+participant "ctrl:ControladorReportesVentas" as C
+participant "rv:«Singleton» RegistroVentas" as RV
+participant "«multiobjeto»\nventas:Venta" as V
+participant "«multiobjeto»\nlineas:DetalleVenta" as LV
+participant "rt:«Singleton» RegistroTurnos" as RT
+participant "t:Turno" as T
 
-U -> P : seleccionarReporte(tipo, filtro)
-activate P
-P -> G : generarReporte(tipo, filtro)
-activate G
-
-alt productos más vendidos (fecha desde / hasta)
-  G -> G : buscarVentas(fechaDesde, fechaHasta)
-  loop por cada venta del período
-    G -> V : estaAnulada()
-    V --> G : Boolean
-    loop por cada línea de una venta no anulada
-      G -> D : getCantidad()
-      D --> G : producto y cantidad
+alt productos más vendidos
+  U -> C : reporteMasVendidos(desde : Date, hasta : Date)
+  activate C
+  C -> RV : buscarVentas(desde : Date, hasta : Date)
+  activate RV
+  RV --> C : «ventas : List<Venta>»
+  deactivate RV
+  loop para cada v en ventas
+    C -> V : estaAnulada()
+    activate V
+    V --> C : «anulada : Boolean»
+    deactivate V
+    opt anulada = false
+      loop para cada lv en lineas de v
+        C -> LV : getProducto()
+        activate LV
+        LV --> C : «p : Producto»
+        C -> LV : getCantidad()
+        LV --> C : «cantidad : Real»
+        deactivate LV
+      end
     end
   end
-  G -> G : ordenarPorCantidadVendida()
-else cantidad de ventas (fecha desde / hasta)
-  G -> G : buscarVentas(fechaDesde, fechaHasta)
-  loop por cada venta del período
-    G -> V : estaAnulada()
-    V --> G : Boolean
+  note right of C : acumula la cantidad vendida\npor producto y ordena
+else cantidad de ventas
+  U -> C : reporteCantidadVentas(desde : Date, hasta : Date)
+  activate C
+  C -> RV : buscarVentas(desde : Date, hasta : Date)
+  activate RV
+  RV --> C : «ventas : List<Venta>»
+  deactivate RV
+  loop para cada v en ventas
+    C -> V : estaAnulada()
+    activate V
+    V --> C : «anulada : Boolean»
+    deactivate V
   end
-  G -> G : contarVentasNoAnuladas()
+  note right of C : cuenta las ventas no anuladas
 else total vendido por turno
-  G -> G : buscarTurno(fecha, tipoTurno)
-  G -> T : calcularTotalVendido()
-  T --> G : total en efectivo, por transferencia y general
+  U -> C : reporteTotalPorTurno(fecha : Date, tipo : TipoTurno)
+  activate C
+  C -> RT : buscarTurno(fecha : Date, tipo : TipoTurno)
+  activate RT
+  RT --> C : «t : Turno»
+  deactivate RT
+  C -> T : calcularTotalVendido()
+  activate T
+  T --> C : «total : Real»
+  deactivate T
 end
 
 alt no hay datos para el filtro (2.a)
-  G --> P : sin datos
-  P --> U : mostrarMensaje("No hay datos para el período seleccionado")
-else hay datos
-  G --> P : resultado del reporte
-  P --> U : mostrarReporte()
-  opt el empleador pide imprimir (2.b)
-    U -> P : imprimirReporte()
-    P -> G : generarDocumento()
-    G --> P : documento imprimible
-    P --> U : mostrarDocumento()
+  C --> U : «no hay datos para el período seleccionado»
+else hay datos (2)
+  C --> U : «reporte»
+  opt pide imprimir (2.b)
+    U -> C : imprimirReporte()
+    C --> U : «documento imprimible»
   end
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

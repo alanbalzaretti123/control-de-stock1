@@ -4,72 +4,69 @@ title DS-12 — Actualizar precios por proveedor (CU-12)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleador" as U
-boundary ":PantallaPrecios" as P
-control ":GestorPrecios" as G
-entity ":Producto" as PR
+actor "empleador:Empleador" as U
+participant "ctrl:ControladorActualizarPrecios" as C
+participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nelegidos:Producto" as P
 
-U -> P : seleccionarProveedor(proveedor)
-activate P
-P -> G : obtenerProductos(proveedor)
-activate G
-G -> G : buscarProductosActivos(proveedor)
-alt el proveedor no tiene productos activos (1.a)
-  G --> P : sin productos
-  P --> U : mostrarMensaje("El proveedor no tiene productos asociados")
-else tiene productos
-  G --> P : productos del proveedor
-  deactivate G
-  P --> U : mostrarProductos(categoría, costo, margen, precio de venta)
-
-  alt se aplica a todos los productos (3)
-    U -> P : seleccionarTodos()
+U -> C : seleccionarProveedor(cuit : String)
+activate C
+C -> CP : buscarProductosActivos(cuit : String)
+activate CP
+CP --> C : «productos : List<Producto>»
+deactivate CP
+alt productos está vacía (1.a)
+  C --> U : «el proveedor no tiene productos asociados»
+else hay productos
+  C --> U : «productos con categoría, costo, margen y precio»
+  deactivate C
+  alt todos los productos (3)
+    U -> C : seleccionarTodos()
   else solo una categoría (3.a)
-    U -> P : filtrarPorCategoria()
-    P --> U : mostrarCategorias()
-    U -> P : seleccionarCategoria(categoria)
-  else selección uno por uno (3.b)
-    U -> P : seleccionarManualmente()
-    P --> U : mostrarListaParaSeleccionar()
-    U -> P : marcarProductos(productos)
+    U -> C : filtrarPorCategoria()
+    C --> U : «categorías del proveedor»
+    U -> C : seleccionarCategoria(idCategoria : Integer)
+  else uno por uno (3.b)
+    U -> C : seleccionarManualmente()
+    C --> U : «lista de productos para marcar»
+    U -> C : marcarProductos(codigos : List<String>)
   end
-
-  P --> U : solicitarPorcentaje()
-  U -> P : ingresarPorcentaje(porcentaje)
-  P -> G : calcularVistaPrevia(productos, porcentaje)
-  activate G
-  G -> G : validarPorcentaje(porcentaje)
-  alt porcentaje inválido (5.a)
-    G --> P : porcentaje inválido
-    P --> U : mostrarMensaje("El porcentaje es inválido")
-  else porcentaje válido
-    loop por cada producto elegido
-      G -> PR : calcularPrecioVenta()
-      note right of PR : con el costo simulado\nsegún el porcentaje
-      PR --> G : nuevo precio
+  activate C
+  C --> U : «solicitar porcentaje»
+  deactivate C
+  U -> C : ingresarPorcentaje(porcentaje : Real)
+  activate C
+  alt porcentaje = 0, <= −100 o no numérico (5.a)
+    C --> U : «porcentaje inválido»
+  else porcentaje válido (6)
+    loop para cada p en elegidos
+      C -> P : calcularPrecioVenta()
+      activate P
+      P --> C : «nuevoPrecio : Real»
+      deactivate P
     end
-    G --> P : vista previa
-    P --> U : mostrarVistaPrevia(valores anteriores y nuevos)
-
-    alt el empleador confirma (7 y 8)
-      U -> P : confirmar()
-      P -> G : aplicarActualizacion()
-      loop por cada producto elegido
-        G -> PR : actualizarCosto(porcentaje)
-        activate PR
-        PR -> PR : calcularPrecioVenta()
-        deactivate PR
+    note right of C : vista previa con el costo\nsimulado, sin guardar
+    C --> U : «vista previa: valores anteriores y nuevos»
+    deactivate C
+    alt confirma (7 y 8)
+      U -> C : confirmarActualizacion()
+      activate C
+      loop para cada p en elegidos
+        C -> P : actualizarCosto(porcentaje : Real)
+        activate P
+        P -> P : calcularPrecioVenta()
+        deactivate P
       end
-      G --> P : precios actualizados
-      P --> U : mostrarConfirmación()
-    else el empleador no confirma (7.a)
-      U -> P : cancelar()
-      P --> U : volver a la selección de productos (paso 3)
+      C --> U : «precios actualizados»
+      deactivate C
+    else no confirma (7.a)
+      U -> C : cancelar()
+      activate C
+      C --> U : «sin cambios: volver a la selección»
+      deactivate C
     end
   end
-  deactivate G
 end
-
-deactivate P
 @enduml

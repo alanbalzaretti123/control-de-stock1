@@ -4,48 +4,48 @@ title DS-16 — Consultar stock y precios (CU-16)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaStock" as P
-control ":GestorStock" as G
-entity ":Usuario" as US
-entity ":Producto" as PR
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorConsultarStock" as C
+participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nencontrados:Producto" as P
+participant "usuario:Usuario" as US
 
-U -> P : consultarProductos(textoBusqueda)
-activate P
-P -> G : buscarProductos(textoBusqueda, usuario)
-activate G
-G -> G : buscarProductos(textoBusqueda)
-
-alt no se encuentran productos (1.a)
-  G --> P : sin resultados
-  P --> U : mostrarMensaje("No se encontraron productos")
-else hay productos
-  loop por cada producto encontrado
-    G -> PR : requiereReposicion()
-    activate PR
-    PR --> G : Boolean
-    deactivate PR
+U -> C : consultarProductos(texto : String)
+activate C
+C -> CP : buscarProductos(texto : String)
+activate CP
+CP --> C : «encontrados : List<Producto>»
+deactivate CP
+alt encontrados está vacía (1.a)
+  C --> U : «no se encontraron productos»
+else hay productos (2)
+  loop para cada p en encontrados
+    C -> P : requiereReposicion()
+    activate P
+    P --> C : «bajoMinimo : Boolean»
+    deactivate P
   end
-  G -> US : esEmpleador()
+  C -> US : esEmpleador()
   activate US
-  US --> G : rol
+  US --> C : «esEmpleador : Boolean»
   deactivate US
-  alt el usuario es Empleador (2.a)
-    G --> P : productos con precio de costo
-  else el usuario es Empleado
-    G --> P : productos sin precio de costo
+  alt esEmpleador = true (2.a)
+    loop para cada p en encontrados
+      C -> P : getPrecioCosto()
+      activate P
+      P --> C : «costo : Real»
+      deactivate P
+    end
+    C --> U : «listado con precio de costo y marca de bajo mínimo»
+  else esEmpleador = false
+    C --> U : «listado sin precio de costo, con marca de bajo mínimo»
   end
-  P --> U : mostrarListado(código, nombre, precio, stock, marca de bajo mínimo)
-
   opt el empleador pide imprimir (2.b)
-    U -> P : imprimirListado()
-    P -> G : generarDocumento()
-    G --> P : documento imprimible
-    P --> U : mostrarDocumento()
+    U -> C : imprimirListado()
+    C --> U : «documento imprimible»
   end
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml

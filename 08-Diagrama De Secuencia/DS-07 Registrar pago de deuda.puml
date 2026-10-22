@@ -4,61 +4,64 @@ title DS-07 — Registrar pago de deuda (CU-07)
 hide footbox
 skinparam sequenceMessageAlign center
 skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline
 
-actor "Empleado / Empleador" as U
-boundary ":PantallaPagoFiado" as P
-control ":GestorFiado" as G
-entity ":Cliente" as C
-entity ":Turno" as T
+actor "empleado:Empleado" as U
+participant "ctrl:ControladorPagoDeuda" as C
+participant "cc:«Singleton» CatalogoClientes" as CC
+participant "c:Cliente" as CL
+participant "rt:«Singleton» RegistroTurnos" as RT
+participant "t:Turno" as T
 
-U -> P : buscarCliente(nombre, apellido)
-activate P
-P -> G : buscarCliente(nombre, apellido)
-activate G
-G -> G : buscarCliente(nombre, apellido)
-G -> C : calcularSaldo()
+U -> C : buscarCliente(nombre : String, apellido : String)
 activate C
-C --> G : saldo
+C -> CC : buscarCliente(nombre : String, apellido : String)
+activate CC
+CC --> C : «c : Cliente»
+deactivate CC
+C -> CL : calcularSaldo()
+activate CL
+CL --> C : «saldo : Real»
+deactivate CL
+C --> U : «saldo adeudado»
 deactivate C
-G --> P : saldo adeudado
-deactivate G
-P --> U : mostrarSaldo(saldo)
 
-alt pago con un solo medio (3)
-  U -> P : ingresarPago(medio, monto)
+alt un solo medio de pago (3)
+  U -> C : registrarPago(medio : MedioPago, monto : Real)
 else pago combinado (3.a)
-  U -> P : indicarPagoCombinado()
-  P --> U : solicitarMontos()
-  U -> P : ingresarMontos(montoEfectivo, montoTransferencia)
+  U -> C : indicarPagoCombinado()
+  C --> U : «solicitar monto de cada medio»
+  U -> C : registrarPagoCombinado(montoEfectivo : Real, montoTransferencia : Real)
 end
-
-P -> G : registrarPago(cliente, montos)
-activate G
-create entity ":PagoFiado" as PF
-G -> PF : crear(cliente, turno, usuario)
-loop por cada medio de pago
-  G -> PF : agregarMedioPago(medio, monto)
+activate C
+C -> RT : buscarTurnoAbierto()
+activate RT
+RT --> C : «t : Turno»
+deactivate RT
+create participant "pf:PagoFiado" as PF
+C -->> PF : create(c : Cliente, t : Turno, usuario : Usuario)
+loop para cada medio de pago
+  C -> PF : agregarMedioPago(medio : MedioPago, monto : Real)
 end
-G -> PF : validarMonto(saldo)
+C -> PF : validarMonto(saldo : Real)
 activate PF
-PF --> G : Boolean
+PF --> C : «valido : Boolean»
 deactivate PF
-
-alt el monto supera el saldo adeudado (4.a)
-  G --> P : monto excedido
-  P --> U : mostrarMensaje("El monto supera la deuda del cliente")
-else monto válido (4)
-  G -> PF : registrar()
-  G -> C : descontarDeuda(total)
-  loop por cada medio de pago
-    create entity ":MovimientoCaja" as M
-    G -> M : registrar()
-    G -> T : registrarMovimiento(movimiento)
+alt valido = false (4.a)
+  C --> U : «el monto supera la deuda del cliente»
+else valido = true (4)
+  C -> PF : registrar()
+  C -> PF : calcularTotal()
+  activate PF
+  PF --> C : «total : Real»
+  deactivate PF
+  C -> CL : descontarDeuda(total : Real)
+  loop para cada medio de pago
+    create participant "m:MovimientoCaja" as M
+    C -->> M : create(PagoFiado, medio : MedioPago, monto : Real, usuario : Usuario)
+    C -> T : registrarMovimiento(m : MovimientoCaja)
   end
-  G --> P : pago registrado
-  P --> U : mostrarComprobante(recibo, saldo restante)
+  C --> U : «recibo y saldo restante»
 end
-
-deactivate G
-deactivate P
+deactivate C
 @enduml
