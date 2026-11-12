@@ -9,15 +9,22 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorPagoProveedor" as C
 participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "«multiobjeto»\nproveedores:Proveedor" as MPV
 participant "pv:Proveedor" as PV
 participant "i:IngresoMercaderia" as I
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "t:Turno" as T
 
 U -> C : seleccionarProveedor(cuit : String)
 activate C
 C -> CPV : buscarProveedor(cuit : String)
 activate CPV
+loop para cada pv en proveedores
+  CPV -> MPV : getCuit()
+  MPV --> CPV : «c : String»
+end
+note right of CPV : si c = cuit\npv = proveedores[i]\ncortar iteración
 CPV --> C : «pv : Proveedor»
 deactivate CPV
 C -> PV : obtenerIngresosPendientes()
@@ -39,7 +46,8 @@ C --> U : «solicitar medio de pago y monto»
 deactivate C
 
 alt un solo medio (5)
-  U -> C : ingresarPago(medio : MedioPago, monto : Real)
+  U -> C : ingresarPago(medio : Char, monto : Real)
+  note right of U : medio: 'E' = efectivo, 'T' = transferencia\n(el controlador lo convierte a MedioPago)
 else pago combinado (5.a)
   U -> C : indicarPagoCombinado()
   C --> U : «solicitar monto de cada medio»
@@ -54,6 +62,11 @@ PP --> C : «valido : Boolean»
 deactivate PP
 C -> RT : buscarTurnoAbierto()
 activate RT
+loop para cada t en turnos
+  RT -> MTU : estaAbierto()
+  MTU --> RT : «abierto : Boolean»
+end
+note right of RT : si abierto = true\nt = turnos[i]\ncortar iteración
 RT --> C : «t : Turno»
 deactivate RT
 C -> T : calcularEfectivoEsperado()

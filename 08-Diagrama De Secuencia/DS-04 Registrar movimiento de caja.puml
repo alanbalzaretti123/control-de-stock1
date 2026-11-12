@@ -9,16 +9,23 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorMovimientoCaja" as C
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "t:Turno" as T
 participant "«multiobjeto»\nmovimientos:MovimientoCaja" as MS
 
-U -> C : registrarMovimiento(tipo : TipoMovimiento, monto : Real, motivo : String)
+U -> C : registrarMovimiento(tipoMovimiento : Char, monto : Real, motivo : String)
+note right of U : tipoMovimiento: 'R' = retiro, 'A' = aporte\n(el controlador lo convierte a TipoMovimiento)
 activate C
 alt monto <= 0 o no numérico (3.a)
   C --> U : «monto inválido»
 else monto válido
   C -> RT : buscarTurnoAbierto()
   activate RT
+  loop para cada t en turnos
+    RT -> MTU : estaAbierto()
+    MTU --> RT : «abierto : Boolean»
+  end
+  note right of RT : si abierto = true\nt = turnos[i]\ncortar iteración
   RT --> C : «t : Turno»
   deactivate RT
   create participant "m:MovimientoCaja" as M

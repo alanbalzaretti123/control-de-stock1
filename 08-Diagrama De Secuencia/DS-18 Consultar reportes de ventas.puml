@@ -9,9 +9,11 @@ skinparam sequenceParticipant underline
 actor "empleador:Empleador" as U
 participant "ctrl:ControladorReportesVentas" as C
 participant "rv:«Singleton» RegistroVentas" as RV
+participant "«multiobjeto»\nventas:Venta" as MVE
 participant "«multiobjeto»\nventas:Venta" as V
 participant "«multiobjeto»\nlineas:DetalleVenta" as LV
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "t:Turno" as T
 
 alt productos más vendidos
@@ -19,6 +21,11 @@ alt productos más vendidos
   activate C
   C -> RV : buscarVentas(desde : Date, hasta : Date)
   activate RV
+  loop para cada v en ventas
+    RV -> MVE : getFechaVenta()
+    MVE --> RV : «f : DateTime»
+  end
+  note right of RV : si desde <= f <= hasta\nagregar v a ventas
   RV --> C : «ventas : List<Venta>»
   deactivate RV
   loop para cada v en ventas
@@ -43,6 +50,11 @@ else cantidad de ventas
   activate C
   C -> RV : buscarVentas(desde : Date, hasta : Date)
   activate RV
+  loop para cada v en ventas
+    RV -> MVE : getFechaVenta()
+    MVE --> RV : «f : DateTime»
+  end
+  note right of RV : si desde <= f <= hasta\nagregar v a ventas
   RV --> C : «ventas : List<Venta>»
   deactivate RV
   loop para cada v en ventas
@@ -53,10 +65,18 @@ else cantidad de ventas
   end
   note right of C : cuenta las ventas no anuladas
 else total vendido por turno
-  U -> C : reporteTotalPorTurno(fecha : Date, tipo : TipoTurno)
+  U -> C : reporteTotalPorTurno(fecha : Date, tipoTurno : Char)
+  note right of U : tipoTurno: 'M' = mañana, 'T' = tarde\n(el controlador lo convierte a TipoTurno)
   activate C
   C -> RT : buscarTurno(fecha : Date, tipo : TipoTurno)
   activate RT
+  loop para cada t en turnos
+    RT -> MTU : getFechaTurno()
+    MTU --> RT : «f : Date»
+    RT -> MTU : getTipoTurno()
+    MTU --> RT : «tt : TipoTurno»
+  end
+  note right of RT : si f = fecha y tt = tipo\nt = turnos[i]\ncortar iteración
   RT --> C : «t : Turno»
   deactivate RT
   C -> T : calcularTotalVendido()

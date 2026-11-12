@@ -9,16 +9,23 @@ skinparam sequenceParticipant underline
 actor "empleador:Empleador" as U
 participant "ctrl:ControladorAnularVenta" as C
 participant "rv:«Singleton» RegistroVentas" as RV
+participant "«multiobjeto»\nventas:Venta" as MVE
 participant "v:Venta" as V
 participant "c:Cliente" as CL
 participant "p:Producto" as P
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "t:Turno" as T
 
 U -> C : anularVenta(numeroComprobante : Integer)
 activate C
 C -> RV : buscarVenta(numeroComprobante : Integer)
 activate RV
+loop para cada v en ventas
+  RV -> MVE : getNumeroComprobante()
+  MVE --> RV : «nro : Integer»
+end
+note right of RV : si nro = numeroComprobante\nv = ventas[i]\ncortar iteración
 RV --> C : «v : Venta»
 deactivate RV
 alt v = null (1.a)
@@ -51,6 +58,11 @@ else v <> null
     alt venta de contado (4)
       C -> RT : buscarTurnoAbierto()
       activate RT
+      loop para cada t en turnos
+        RT -> MTU : estaAbierto()
+        MTU --> RT : «abierto : Boolean»
+      end
+      note right of RT : si abierto = true\nt = turnos[i]\ncortar iteración
       RT --> C : «t : Turno»
       deactivate RT
       loop para cada medio de pago de la venta

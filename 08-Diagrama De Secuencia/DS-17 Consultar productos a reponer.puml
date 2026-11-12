@@ -9,12 +9,22 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorProductosAReponer" as C
 participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nproductos:Producto" as MPR
 participant "«multiobjeto»\nactivos:Producto" as P
 
 U -> C : consultarProductosAReponer(cuit : String, idCategoria : Integer)
 activate C
 C -> CP : buscarProductosActivos(cuit : String, idCategoria : Integer)
 activate CP
+loop para cada p en productos
+  CP -> MPR : estaActivo()
+  MPR --> CP : «activo : Boolean»
+  CP -> MPR : getCuitProveedor()
+  MPR --> CP : «cuitP : String»
+  CP -> MPR : getIdCategoria()
+  MPR --> CP : «idCat : Integer»
+end
+note right of CP : si activo = true y (cuitP = cuit o sin filtro)\ny (idCat = idCategoria o sin filtro)\nagregar p a activos
 CP --> C : «activos : List<Producto>»
 deactivate CP
 loop para cada p en activos

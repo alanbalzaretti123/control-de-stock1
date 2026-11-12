@@ -9,14 +9,21 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorIngresoMercaderia" as C
 participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "«multiobjeto»\nproveedores:Proveedor" as MPV
 participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nproductos:Producto" as MPR
 participant "p:Producto" as P
-participant "ri:«Singleton» RegistroIngresos" as RI
+participant "«multiobjeto»\ningresos:IngresoMercaderia" as MIN
 
 U -> C : crearNuevoIngreso(cuit : String, numeroRemito : String)
 activate C
 C -> CPV : buscarProveedor(cuit : String)
 activate CPV
+loop para cada pv en proveedores
+  CPV -> MPV : getCuit()
+  MPV --> CPV : «c : String»
+end
+note right of CPV : si c = cuit\npv = proveedores[i]\ncortar iteración
 CPV --> C : «pv : Proveedor»
 deactivate CPV
 create participant "i:IngresoMercaderia" as I
@@ -29,6 +36,11 @@ loop más productos recibidos
   activate C
   C -> CP : buscarProducto(codigo : String)
   activate CP
+  loop para cada p en productos
+    CP -> MPR : getCodigoBarras()
+    MPR --> CP : «cod : String»
+  end
+  note right of CP : si cod = codigo\np = productos[i]\ncortar iteración
   CP --> C : «p : Producto»
   deactivate CP
   C -> I : agregarProducto(p : Producto, cantidad : Real)
@@ -56,7 +68,7 @@ loop para cada di en detalles
 end
 I --> C
 deactivate I
-C -> RI : agregarIngreso(i : IngresoMercaderia)
+C -> MIN : add(i : IngresoMercaderia)
 C --> U : «ingreso registrado: ¿paga en el momento?»
 deactivate C
 

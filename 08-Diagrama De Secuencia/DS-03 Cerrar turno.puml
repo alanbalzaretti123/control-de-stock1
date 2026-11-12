@@ -9,6 +9,7 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorCerrarTurno" as C
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "t:Turno" as T
 participant "«multiobjeto»\nmovimientos:MovimientoCaja" as M
 
@@ -16,6 +17,11 @@ U -> C : iniciarCierreTurno()
 activate C
 C -> RT : buscarTurnoAbierto()
 activate RT
+loop para cada t en turnos
+  RT -> MTU : estaAbierto()
+  MTU --> RT : «abierto : Boolean»
+end
+note right of RT : si abierto = true\nt = turnos[i]\ncortar iteración
 RT --> C : «t : Turno»
 deactivate RT
 C --> U : «solicitar efectivo contado»

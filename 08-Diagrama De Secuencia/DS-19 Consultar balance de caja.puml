@@ -9,16 +9,26 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorBalanceCaja" as C
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "«multiobjeto»\nturnos:Turno" as T
 participant "«multiobjeto»\nmovimientos:MovimientoCaja" as M
 participant "usuario:Usuario" as US
 participant "rv:«Singleton» RegistroVentas" as RV
+participant "«multiobjeto»\nventas:Venta" as MVE
 participant "«multiobjeto»\nventas:Venta" as V
 
-U -> C : consultarBalance(desde : Date, hasta : Date, tipo : TipoTurno)
+U -> C : consultarBalance(desde : Date, hasta : Date, tipoTurno : Char)
+note right of U : tipoTurno: 'M' = mañana, 'T' = tarde\n(el controlador lo convierte a TipoTurno)
 activate C
 C -> RT : buscarTurnos(desde : Date, hasta : Date, tipo : TipoTurno)
 activate RT
+loop para cada t en turnos
+  RT -> MTU : getFechaTurno()
+  MTU --> RT : «f : Date»
+  RT -> MTU : getTipoTurno()
+  MTU --> RT : «tt : TipoTurno»
+end
+note right of RT : si desde <= f <= hasta y tt = tipo\nagregar t a turnos
 RT --> C : «turnos : List<Turno>»
 deactivate RT
 alt turnos está vacía (1.a)
@@ -45,6 +55,11 @@ else hay turnos (2)
   opt esEmpleador = true (2.a)
     C -> RV : buscarVentas(desde : Date, hasta : Date)
     activate RV
+    loop para cada v en ventas
+      RV -> MVE : getFechaVenta()
+      MVE --> RV : «f : DateTime»
+    end
+    note right of RV : si desde <= f <= hasta\nagregar v a ventas
     RV --> C : «ventas : List<Venta>»
     deactivate RV
     loop para cada v no anulada en ventas

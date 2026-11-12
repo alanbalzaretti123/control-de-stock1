@@ -9,6 +9,7 @@ skinparam sequenceParticipant underline
 actor "empleador:Empleador" as U
 participant "ctrl:ControladorGestionarCategorias" as C
 participant "ccat:«Singleton» CatalogoCategorias" as CCAT
+participant "«multiobjeto»\ncategorias:Categoria" as MCA
 participant "cat:Categoria" as CA
 
 alt alta de categoría (camino básico)
@@ -16,6 +17,11 @@ alt alta de categoría (camino básico)
   activate C
   C -> CCAT : buscarCategoria(nombre : String)
   activate CCAT
+  loop para cada cat en categorias
+    CCAT -> MCA : getNombreCategoria()
+    MCA --> CCAT : «n : String»
+  end
+  note right of CCAT : si n = nombre\nexistente = categorias[i]\ncortar iteración
   CCAT --> C : «existente : Categoria»
   deactivate CCAT
   alt existente <> null (4.a)
@@ -24,7 +30,7 @@ alt alta de categoría (camino básico)
     create participant "nueva:Categoria" as N
     C -->> N : create(nombre : String, descripcion : String)
     C -> N : darDeAlta()
-    C -> CCAT : agregarCategoria(nueva : Categoria)
+    C -> MCA : add(nueva : Categoria)
     C --> U : «categoría registrada»
   end
   deactivate C
@@ -33,6 +39,11 @@ else modificar (1.a)
   activate C
   C -> CCAT : buscarCategoria(idCategoria : Integer)
   activate CCAT
+  loop para cada cat en categorias
+    CCAT -> MCA : getIdCategoria()
+    MCA --> CCAT : «id : Integer»
+  end
+  note right of CCAT : si id = idCategoria\ncat = categorias[i]\ncortar iteración
   CCAT --> C : «cat : Categoria»
   deactivate CCAT
   C --> U : «datos de la categoría»
@@ -45,6 +56,11 @@ else eliminar (1.b)
   activate C
   C -> CCAT : buscarCategoria(idCategoria : Integer)
   activate CCAT
+  loop para cada cat en categorias
+    CCAT -> MCA : getIdCategoria()
+    MCA --> CCAT : «id : Integer»
+  end
+  note right of CCAT : si id = idCategoria\ncat = categorias[i]\ncortar iteración
   CCAT --> C : «cat : Categoria»
   deactivate CCAT
   C -> CA : tieneProductos()
@@ -57,7 +73,7 @@ else eliminar (1.b)
     C --> U : «¿confirma la eliminación?»
     U -> C : confirmarEliminacion()
     C -> CA : eliminar()
-    C -> CCAT : quitarCategoria(cat : Categoria)
+    C -> MCA : remove(cat : Categoria)
     C --> U : «categoría eliminada»
   end
   deactivate C

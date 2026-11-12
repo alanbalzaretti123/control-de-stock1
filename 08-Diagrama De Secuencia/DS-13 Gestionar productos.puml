@@ -9,19 +9,33 @@ skinparam sequenceParticipant underline
 actor "empleador:Empleador" as U
 participant "ctrl:ControladorGestionarProductos" as C
 participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nproductos:Producto" as MPR
 participant "ccat:«Singleton» CatalogoCategorias" as CCAT
+participant "«multiobjeto»\ncategorias:Categoria" as MCA
 participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "«multiobjeto»\nproveedores:Proveedor" as MPV
 participant "p:Producto" as P
 
 alt alta de producto (camino básico)
-  U -> C : altaProducto(codigo : String, nombre : String, idCategoria : Integer, cuit : String,\nunidad : UnidadMedida, costo : Real, margen : Real, stockInicial : Real, stockMinimo : Real)
+  U -> C : altaProducto(codigo : String, nombre : String, idCategoria : Integer, cuit : String,\nunidad : Char, costo : Real, margen : Real, stockInicial : Real, stockMinimo : Real)
+  note right of U : unidad: 'U' = unidad, 'K' = kilogramo\n(el controlador lo convierte a UnidadMedida)
   activate C
   C -> CCAT : buscarCategoria(idCategoria : Integer)
   activate CCAT
+  loop para cada cat en categorias
+    CCAT -> MCA : getIdCategoria()
+    MCA --> CCAT : «id : Integer»
+  end
+  note right of CCAT : si id = idCategoria\ncat = categorias[i]\ncortar iteración
   CCAT --> C : «cat : Categoria»
   deactivate CCAT
   C -> CPV : buscarProveedor(cuit : String)
   activate CPV
+  loop para cada pv en proveedores
+    CPV -> MPV : getCuit()
+    MPV --> CPV : «c : String»
+  end
+  note right of CPV : si c = cuit\npv = proveedores[i]\ncortar iteración
   CPV --> C : «pv : Proveedor»
   deactivate CPV
   create participant "nuevo:Producto" as N
@@ -48,13 +62,18 @@ alt alta de producto (camino básico)
   activate C
   C -> CP : buscarProducto(codigo : String)
   activate CP
+  loop para cada p en productos
+    CP -> MPR : getCodigoBarras()
+    MPR --> CP : «cod : String»
+  end
+  note right of CP : si cod = codigo\nexistente = productos[i]\ncortar iteración
   CP --> C : «existente : Producto»
   deactivate CP
   alt existente <> null (6.a)
     C --> U : «el código ya existe»
   else existente = null (6)
     C -> N : darDeAlta()
-    C -> CP : agregarProducto(nuevo : Producto)
+    C -> MPR : add(nuevo : Producto)
     C --> U : «producto registrado»
   end
   deactivate C
@@ -63,6 +82,11 @@ else modificar (1.a)
   activate C
   C -> CP : buscarProducto(codigo : String)
   activate CP
+  loop para cada p en productos
+    CP -> MPR : getCodigoBarras()
+    MPR --> CP : «cod : String»
+  end
+  note right of CP : si cod = codigo\np = productos[i]\ncortar iteración
   CP --> C : «p : Producto»
   deactivate CP
   C --> U : «datos actuales»
@@ -87,13 +111,18 @@ else dar de baja (1.b)
   activate C
   C -> CP : buscarProducto(codigo : String)
   activate CP
+  loop para cada p en productos
+    CP -> MPR : getCodigoBarras()
+    MPR --> CP : «cod : String»
+  end
+  note right of CP : si cod = codigo\np = productos[i]\ncortar iteración
   CP --> C : «p : Producto»
   deactivate CP
   C --> U : «¿confirma la baja?»
   U -> C : confirmarBaja()
   C -> P : darDeBaja()
   note right of P : queda inactivo, sin borrarse\ndel historial de ventas
-  C --> U : «producto dado de baja»
+  C --> U : «producto inactivo»
   deactivate C
 end
 @enduml

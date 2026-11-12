@@ -9,12 +9,18 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorIniciarSesion" as C
 participant "cu:«Singleton» CatalogoUsuarios" as CU
+participant "«multiobjeto»\nusuarios:Usuario" as MUS
 participant "u:Usuario" as US
 
 U -> C : iniciarSesion(nombreUsuario : String, contraseña : String)
 activate C
 C -> CU : buscarUsuario(nombreUsuario : String)
 activate CU
+loop para cada u en usuarios
+  CU -> MUS : getNombreUsuario()
+  MUS --> CU : «nombre : String»
+end
+note right of CU : si nombre = nombreUsuario\nu = usuarios[i]\ncortar iteración
 CU --> C : «u : Usuario»
 deactivate CU
 alt u = null (2.a)

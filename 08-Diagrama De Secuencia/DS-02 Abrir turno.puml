@@ -9,6 +9,7 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorAbrirTurno" as C
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "usuario:Usuario" as US
 participant "tc:Turno" as TC
 
@@ -16,6 +17,11 @@ U -> C : iniciarAperturaTurno()
 activate C
 C -> RT : buscarTurnoAbierto()
 activate RT
+loop para cada t en turnos
+  RT -> MTU : estaAbierto()
+  MTU --> RT : «abierto : Boolean»
+end
+note right of RT : si abierto = true\nta = turnos[i]\ncortar iteración
 RT --> C : «ta : Turno»
 deactivate RT
 alt ta <> null (1.a)
@@ -23,13 +29,21 @@ alt ta <> null (1.a)
 else ta = null
   C --> U : «solicitar tipo de turno y monto inicial»
   deactivate C
-  U -> C : ingresarDatosTurno(tipo : TipoTurno, montoInicial : Real)
+  U -> C : ingresarDatosTurno(tipoTurno : Char, montoInicial : Real)
+  note right of U : tipoTurno: 'M' = mañana, 'T' = tarde\n(el controlador lo convierte a TipoTurno)
   activate C
   alt montoInicial < 0 o no numérico (3.a)
     C --> U : «monto inválido»
   else monto válido
     C -> RT : buscarTurno(fecha : Date, tipo : TipoTurno)
     activate RT
+    loop para cada t en turnos
+      RT -> MTU : getFechaTurno()
+      MTU --> RT : «f : Date»
+      RT -> MTU : getTipoTurno()
+      MTU --> RT : «tt : TipoTurno»
+    end
+    note right of RT : si f = fecha y tt = tipo\ntc = turnos[i]\ncortar iteración
     RT --> C : «tc : Turno»
     deactivate RT
     alt tc = null
@@ -39,7 +53,7 @@ else ta = null
       activate T
       T --> C
       deactivate T
-      C -> RT : agregarTurno(t : Turno)
+      C -> MTU : add(t : Turno)
       C --> U : «turno abierto»
     else tc <> null
       C -> US : esEmpleador()

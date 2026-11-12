@@ -9,6 +9,7 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorConsultarStock" as C
 participant "cp:«Singleton» CatalogoProductos" as CP
+participant "«multiobjeto»\nproductos:Producto" as MPR
 participant "«multiobjeto»\nencontrados:Producto" as P
 participant "usuario:Usuario" as US
 
@@ -16,6 +17,13 @@ U -> C : consultarProductos(texto : String)
 activate C
 C -> CP : buscarProductos(texto : String)
 activate CP
+loop para cada p en productos
+  CP -> MPR : getNombreProducto()
+  MPR --> CP : «n : String»
+  CP -> MPR : getCodigoBarras()
+  MPR --> CP : «cod : String»
+end
+note right of CP : si n contiene texto o cod = texto\nagregar p a encontrados
 CP --> C : «encontrados : List<Producto>»
 deactivate CP
 alt encontrados está vacía (1.a)

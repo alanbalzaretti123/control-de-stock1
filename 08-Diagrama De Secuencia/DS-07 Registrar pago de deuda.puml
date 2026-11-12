@@ -9,14 +9,23 @@ skinparam sequenceParticipant underline
 actor "empleado:Empleado" as U
 participant "ctrl:ControladorPagoDeuda" as C
 participant "cc:«Singleton» CatalogoClientes" as CC
+participant "«multiobjeto»\nclientes:Cliente" as MCL
 participant "c:Cliente" as CL
 participant "rt:«Singleton» RegistroTurnos" as RT
+participant "«multiobjeto»\nturnos:Turno" as MTU
 participant "t:Turno" as T
 
 U -> C : buscarCliente(nombre : String, apellido : String)
 activate C
 C -> CC : buscarCliente(nombre : String, apellido : String)
 activate CC
+loop para cada c en clientes
+  CC -> MCL : getNombreCliente()
+  MCL --> CC : «n : String»
+  CC -> MCL : getApellidoCliente()
+  MCL --> CC : «a : String»
+end
+note right of CC : si n = nombre y a = apellido\nc = clientes[i]\ncortar iteración
 CC --> C : «c : Cliente»
 deactivate CC
 C -> CL : calcularSaldo()
@@ -27,7 +36,8 @@ C --> U : «saldo adeudado»
 deactivate C
 
 alt un solo medio de pago (3)
-  U -> C : registrarPago(medio : MedioPago, monto : Real)
+  U -> C : registrarPago(medio : Char, monto : Real)
+  note right of U : medio: 'E' = efectivo, 'T' = transferencia\n(el controlador lo convierte a MedioPago)
 else pago combinado (3.a)
   U -> C : indicarPagoCombinado()
   C --> U : «solicitar monto de cada medio»
@@ -36,6 +46,11 @@ end
 activate C
 C -> RT : buscarTurnoAbierto()
 activate RT
+loop para cada t en turnos
+  RT -> MTU : estaAbierto()
+  MTU --> RT : «abierto : Boolean»
+end
+note right of RT : si abierto = true\nt = turnos[i]\ncortar iteración
 RT --> C : «t : Turno»
 deactivate RT
 create participant "pf:PagoFiado" as PF

@@ -9,13 +9,20 @@ skinparam sequenceParticipant underline
 actor "empleador:Empleador" as U
 participant "ctrl:ControladorGestionarUsuarios" as C
 participant "cu:«Singleton» CatalogoUsuarios" as CU
+participant "«multiobjeto»\nusuarios:Usuario" as MUS
 participant "u:Usuario" as US
 
 alt alta de usuario (camino básico)
-  U -> C : altaUsuario(nombreUsuario : String, nombreCompleto : String, rol : RolUsuario, contraseña : String)
+  U -> C : altaUsuario(nombreUsuario : String, nombreCompleto : String, rol : Char, contraseña : String)
+  note right of U : rol: 'D' = empleador, 'E' = empleado\n(el controlador lo convierte a RolUsuario)
   activate C
   C -> CU : buscarUsuario(nombreUsuario : String)
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : getNombreUsuario()
+    MUS --> CU : «nombre : String»
+  end
+  note right of CU : si nombre = nombreUsuario\nexistente = usuarios[i]\ncortar iteración
   CU --> C : «existente : Usuario»
   deactivate CU
   alt existente <> null (4.a)
@@ -24,7 +31,7 @@ alt alta de usuario (camino básico)
     create participant "nuevo:Usuario" as N
     C -->> N : create(nombreUsuario : String, nombreCompleto : String, rol : RolUsuario, contraseña : String)
     C -> N : darDeAlta()
-    C -> CU : agregarUsuario(nuevo : Usuario)
+    C -> MUS : add(nuevo : Usuario)
     C --> U : «usuario registrado (activo)»
   end
   deactivate C
@@ -33,12 +40,25 @@ else modificar (1.a)
   activate C
   C -> CU : buscarUsuario(nombreUsuario : String)
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : getNombreUsuario()
+    MUS --> CU : «nombre : String»
+  end
+  note right of CU : si nombre = nombreUsuario\nu = usuarios[i]\ncortar iteración
   CU --> C : «u : Usuario»
   deactivate CU
   C --> U : «nombre completo y rol»
-  U -> C : modificarUsuario(nombreCompleto : String, rol : RolUsuario)
+  U -> C : modificarUsuario(nombreCompleto : String, rol : Char)
+  note right of U : rol: 'D' = empleador, 'E' = empleado\n(el controlador lo convierte a RolUsuario)
   C -> CU : contarEmpleadoresActivos()
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : esEmpleador()
+    MUS --> CU : «esEmpleador : Boolean»
+    CU -> MUS : getEstadoUsuario()
+    MUS --> CU : «estado : EstadoRegistro»
+  end
+  note right of CU : si esEmpleador = true y estado = Activo\ncantidad = cantidad + 1
   CU --> C : «cantidad : Integer»
   deactivate CU
   alt el cambio deja sin empleadores activos (1.a.2.a)
@@ -53,6 +73,11 @@ else restablecer contraseña (1.b)
   activate C
   C -> CU : buscarUsuario(nombreUsuario : String)
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : getNombreUsuario()
+    MUS --> CU : «nombre : String»
+  end
+  note right of CU : si nombre = nombreUsuario\nu = usuarios[i]\ncortar iteración
   CU --> C : «u : Usuario»
   deactivate CU
   C --> U : «solicitar nueva contraseña»
@@ -65,12 +90,24 @@ else dar de baja (1.c)
   activate C
   C -> CU : buscarUsuario(nombreUsuario : String)
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : getNombreUsuario()
+    MUS --> CU : «nombre : String»
+  end
+  note right of CU : si nombre = nombreUsuario\nu = usuarios[i]\ncortar iteración
   CU --> C : «u : Usuario»
   deactivate CU
   C --> U : «¿confirma la baja?»
   U -> C : confirmarBaja()
   C -> CU : contarEmpleadoresActivos()
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : esEmpleador()
+    MUS --> CU : «esEmpleador : Boolean»
+    CU -> MUS : getEstadoUsuario()
+    MUS --> CU : «estado : EstadoRegistro»
+  end
+  note right of CU : si esEmpleador = true y estado = Activo\ncantidad = cantidad + 1
   CU --> C : «cantidad : Integer»
   deactivate CU
   alt u es el único empleador activo (1.c.2.a)
@@ -85,6 +122,11 @@ else reactivar (1.d)
   activate C
   C -> CU : buscarUsuario(nombreUsuario : String)
   activate CU
+  loop para cada u en usuarios
+    CU -> MUS : getNombreUsuario()
+    MUS --> CU : «nombre : String»
+  end
+  note right of CU : si nombre = nombreUsuario\nu = usuarios[i]\ncortar iteración
   CU --> C : «u : Usuario»
   deactivate CU
   C -> US : reactivar()

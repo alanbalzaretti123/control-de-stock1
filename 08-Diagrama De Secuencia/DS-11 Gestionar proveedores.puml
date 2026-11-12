@@ -9,13 +9,19 @@ skinparam sequenceParticipant underline
 actor "empleador:Empleador" as U
 participant "ctrl:ControladorGestionarProveedores" as C
 participant "cpv:«Singleton» CatalogoProveedores" as CPV
+participant "«multiobjeto»\nproveedores:Proveedor" as MPV
 participant "pv:Proveedor" as PV
 
 alt alta de proveedor (camino básico)
-  U -> C : altaProveedor(cuit : String, razonSocial : String, telefono : String, email : String, direccion : Direccion)
+  U -> C : altaProveedor(cuit : String, razonSocial : String, telefono : String, email : String, calle : String, numero : String, codigoPostal : String, localidad : String)
   activate C
   C -> CPV : buscarProveedor(cuit : String)
   activate CPV
+  loop para cada pv en proveedores
+    CPV -> MPV : getCuit()
+    MPV --> CPV : «c : String»
+  end
+  note right of CPV : si c = cuit\nexistente = proveedores[i]\ncortar iteración
   CPV --> C : «existente : Proveedor»
   deactivate CPV
   alt existente <> null (4.a)
@@ -26,7 +32,7 @@ alt alta de proveedor (camino básico)
     create participant "d:Direccion" as DI
     N -->> DI : create(calle : String, numero : String, codigoPostal : String, localidad : String)
     C -> N : darDeAlta()
-    C -> CPV : agregarProveedor(nuevo : Proveedor)
+    C -> MPV : add(nuevo : Proveedor)
     C --> U : «proveedor registrado»
   end
   deactivate C
@@ -35,10 +41,15 @@ else modificar (1.a)
   activate C
   C -> CPV : buscarProveedor(cuit : String)
   activate CPV
+  loop para cada pv en proveedores
+    CPV -> MPV : getCuit()
+    MPV --> CPV : «c : String»
+  end
+  note right of CPV : si c = cuit\npv = proveedores[i]\ncortar iteración
   CPV --> C : «pv : Proveedor»
   deactivate CPV
   C --> U : «datos del proveedor»
-  U -> C : modificarProveedor(razonSocial : String, telefono : String, email : String, direccion : Direccion)
+  U -> C : modificarProveedor(razonSocial : String, telefono : String, email : String, calle : String, numero : String, codigoPostal : String, localidad : String)
   C -> PV : modificar()
   C --> U : «proveedor actualizado»
   deactivate C
@@ -47,6 +58,11 @@ else dar de baja (1.b)
   activate C
   C -> CPV : buscarProveedor(cuit : String)
   activate CPV
+  loop para cada pv en proveedores
+    CPV -> MPV : getCuit()
+    MPV --> CPV : «c : String»
+  end
+  note right of CPV : si c = cuit\npv = proveedores[i]\ncortar iteración
   CPV --> C : «pv : Proveedor»
   deactivate CPV
   C -> PV : tieneProductosActivos()
