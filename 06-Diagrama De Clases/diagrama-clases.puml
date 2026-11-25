@@ -57,7 +57,7 @@ package "Enumeraciones" {
 
 ' ===================== Usuarios y caja =====================
 class Usuario {
-  - nombreUsuario: String {id}
+  - nombreUsuario: String
   - contraseña: String
   - nombreCompleto: String
   - rol: RolUsuario
@@ -73,8 +73,8 @@ class Usuario {
 }
 
 class Turno {
-  - fechaTurno: Date {id}
-  - tipoTurno: TipoTurno {id}
+  - fechaTurno: Date
+  - tipoTurno: TipoTurno
   - horaApertura: Time
   - horaCierre: Time
   - montoInicialCaja: Decimal
@@ -92,7 +92,7 @@ class Turno {
 }
 
 class MovimientoCaja {
-  - numeroMovimiento: Integer {id}
+  - numeroMovimiento: Integer
   - fechaHoraMovimiento: DateTime
   - tipoMovimiento: TipoMovimiento
   - medioPago: MedioPago
@@ -105,7 +105,7 @@ class MovimientoCaja {
 
 ' ===================== Ventas =====================
 class Venta {
-  - numeroComprobante: Integer {id}
+  - numeroComprobante: Integer
   - fechaVenta: DateTime
   - condicionVenta: CondicionVenta
   - totalVenta: Decimal
@@ -137,13 +137,12 @@ class DetalleVenta {
 }
 
 class DetallePago {
-  - medioPago: MedioPago {id}
+  - medioPago: MedioPago
   - monto: Decimal
 }
 
 ' ===================== Fiado =====================
 class Cliente {
-  - idCliente: Integer {id}
   - nombreCliente: String
   - apellidoCliente: String
   - telefono: String
@@ -161,7 +160,7 @@ class Cliente {
 }
 
 class PagoFiado {
-  - numeroRecibo: Integer {id}
+  - numeroRecibo: Integer
   - fechaPago: Date
   - montoTotal: Decimal
   + agregarMedioPago(medio: MedioPago, monto: Decimal): void
@@ -171,13 +170,13 @@ class PagoFiado {
 }
 
 class MedioPagoFiado {
-  - medioPago: MedioPago {id}
+  - medioPago: MedioPago
   - monto: Decimal
 }
 
 ' ===================== Productos =====================
 class Producto {
-  - codigoBarras: String {id}
+  - codigoBarras: String
   - nombreProducto: String
   - descripcionProducto: String
   - unidadMedida: UnidadMedida
@@ -203,7 +202,6 @@ class Producto {
 }
 
 class Categoria {
-  - idCategoria: Integer {id}
   - nombreCategoria: String
   - descripcionCategoria: String
   + darDeAlta(): void
@@ -214,7 +212,7 @@ class Categoria {
 
 ' ===================== Proveedores y mercadería =====================
 class Proveedor {
-  - cuit: String {id}
+  - cuit: String
   - razonSocial: String
   - telefono: String
   - email: String
@@ -235,7 +233,6 @@ class Direccion {
 }
 
 class IngresoMercaderia {
-  - idIngreso: Integer {id}
   - numeroRemito: String
   - fechaIngreso: Date
   - montoTotal: Decimal
@@ -250,7 +247,6 @@ class DetalleIngreso {
 }
 
 class PagoProveedor {
-  - idPagoProveedor: Integer {id}
   - fechaPago: Date
   - medioPago: MedioPago
   - monto: Decimal
